@@ -66,8 +66,16 @@
     <Reference Include="UnityEditor.iOS.Extensions.Xcode">
       <HintPath>Library\UnityAssemblies\UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
     </Reference>
+<<<<<<< HEAD
     <Reference Include="LeapCSharp.NET3.5">
       <HintPath>Assets\Plugins\LeapCSharp.NET3.5.dll</HintPath>
+=======
+    <Reference Include="RAIN">
+      <HintPath>Assets\RAIN\RAIN.dll</HintPath>
+    </Reference>
+    <Reference Include="RAINMetaform">
+      <HintPath>Assets\RAIN\RAINMetaform.dll</HintPath>
+>>>>>>> 74265990ab451f618390f1cf902ab5fa4778c342
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +123,7 @@
     <Compile Include="Assets\Environment\Standard Assets\Utility\TimedObjectDestructor.cs" />
     <Compile Include="Assets\Environment\Standard Assets\Utility\WaypointCircuit.cs" />
     <Compile Include="Assets\Environment\Standard Assets\Utility\WaypointProgressTracker.cs" />
+<<<<<<< HEAD
     <Compile Include="Assets\LeapMotion+OVR\DemoResources\Scripts\BlocksPlaneGenerator.cs" />
     <Compile Include="Assets\LeapMotion+OVR\DemoResources\Scripts\MovementManager.cs" />
     <Compile Include="Assets\LeapMotion+OVR\DemoResources\Scripts\RandomBlocksGenerator.cs" />
@@ -222,6 +231,17 @@
     <Compile Include="Assets\Scripts\OSC\OSCServer.cs" />
     <Compile Include="Assets\Scripts\OSCHandler.cs" />
     <Compile Include="Assets\Scripts\OSCTestData.cs" />
+=======
+    <Compile Include="Assets\OSC\OSCBundle.cs" />
+    <Compile Include="Assets\OSC\OSCClient.cs" />
+    <Compile Include="Assets\OSC\OSCMessage.cs" />
+    <Compile Include="Assets\OSC\OSCPacket.cs" />
+    <Compile Include="Assets\OSC\OSCServer.cs" />
+    <Compile Include="Assets\OSCHandler.cs" />
+    <Compile Include="Assets\OSCTestData.cs" />
+    <Compile Include="Assets\Scripts\AI\MoveOnSphere.cs" />
+    <Compile Include="Assets\Scripts\CameraMovement.cs" />
+>>>>>>> 74265990ab451f618390f1cf902ab5fa4778c342
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Environment\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
@@ -229,6 +249,7 @@
     <None Include="Assets\Environment\Standard Assets\ParticleSystems\Shaders\PriorityParticleAdd.shader" />
     <None Include="Assets\Environment\Standard Assets\ParticleSystems\Shaders\PriorityParticleAddSoft.shader" />
     <None Include="Assets\Environment\Standard Assets\ParticleSystems\Shaders\PriorityParticleAlpha.shader" />
+<<<<<<< HEAD
     <None Include="Assets\LeapMotion\DemoResources\ScrollerText.txt" />
     <None Include="Assets\LeapMotion\Dependencies.txt" />
     <None Include="Assets\LeapMotion\Materials\Sources\Shaders\Toony-Basic.shader" />
@@ -251,6 +272,17 @@
     <None Include="Assets\Plugins\donotdelete.txt" />
     <None Include="Assets\Plugins\x86\donotdelete.txt" />
     <None Include="Assets\Plugins\x86_64\donotdelete.txt" />
+=======
+    <None Include="Assets\RAIN\Editor\ScriptTemplates\BehaviorTreeTemplate.xml" />
+    <None Include="Assets\RAIN\Editor\Shaders\AspectRingShader.shader" />
+    <None Include="Assets\RAIN\Editor\Shaders\AspectSphereShader.shader" />
+    <None Include="Assets\RAIN\Editor\Shaders\NavMeshColliderShader.shader" />
+    <None Include="Assets\RAIN\Editor\Shaders\NavMeshContourShader.shader" />
+    <None Include="Assets\RAIN\Editor\Shaders\VisualSensorLineShader.shader" />
+    <None Include="Assets\RAIN\Editor\Shaders\VisualSensorRingShader.shader" />
+    <None Include="Assets\RAIN\Editor\Shaders\WaypointShader.shader" />
+    <None Include="Assets\RAIN\ReleaseNotes.txt" />
+>>>>>>> 74265990ab451f618390f1cf902ab5fa4778c342
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>
