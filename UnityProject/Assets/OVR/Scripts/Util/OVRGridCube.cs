@@ -20,6 +20,7 @@ limitations under the License.
 ************************************************************************************/
 
 using UnityEngine;
+using UnityEngine.Rendering;
 using System.Collections;
 
 /// <summary>
@@ -135,7 +136,7 @@ public class OVRGridCube : MonoBehaviour
 				
 				// No shadows
 				Renderer r = cube.GetComponent<Renderer>();
-				r.castShadows    = false;
+                r.shadowCastingMode = ShadowCastingMode.Off;
 				r.receiveShadows = false;
 				
 				// Cube line is white down the middle

@@ -19,6 +19,9 @@ limitations under the License.
 
 ************************************************************************************/
 
+// Disabled Warnings for obsolete code in this file since we cannot change it atm. | Stefan Seibert, 21.09.2015
+#pragma warning disable 618
+
 using System;
 using System.Runtime.InteropServices;
 using UnityEngine;

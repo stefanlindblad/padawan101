@@ -7,7 +7,6 @@ public class MoveOnSphere : MonoBehaviour
 {
 	// Variables
 	public float smoothTime = 0.3f;
-	public Transform camera;
 	private Vector3 velocity = Vector3.zero;
 
 	Vector3 nextPosition;
