@@ -224,6 +224,7 @@
     <Compile Include="Assets\ScoreTexter.cs" />
     <Compile Include="Assets\Scripts\AI\MoveOnSphere.cs" />
     <Compile Include="Assets\Scripts\CameraMovement.cs" />
+    <Compile Include="Assets\Scripts\LeapMotionVolumeRenderer.cs" />
     <Compile Include="Assets\Scripts\LightSaberController.cs" />
     <Compile Include="Assets\Scripts\MainEngine.cs" />
     <Compile Include="Assets\Scripts\OSC\OSCBundle.cs" />
