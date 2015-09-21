@@ -14,7 +14,7 @@ public class MovingText : MonoBehaviour {
 
     void FixedUpdate ()
     {
-        speed=5f;
+        speed=2f;
 
         Vector3 movement = new Vector3 (0.0f, 1, 1);
 
