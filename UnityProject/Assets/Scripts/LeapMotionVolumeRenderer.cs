@@ -8,7 +8,7 @@ public class LeapMotionVolumeRenderer : MonoBehaviour {
     private const float BOX_DEPTH = 0.6671f;
     private Color c1 = Color.blue;
     private Color c2 = Color.blue;
-    private int lengthOfLineRenderer = 12;
+    private int lengthOfLineRenderer = 5;
 
     private HandController _controller;
     private LineRenderer _renderer;
@@ -45,19 +45,24 @@ public class LeapMotionVolumeRenderer : MonoBehaviour {
 
         if(_controller && _renderer)
         {
-
-            _renderer.SetPosition(0, origin);
-            _renderer.SetPosition(1, top_left);
-            _renderer.SetPosition(2, origin);
+            _renderer.SetPosition(0, bottom_right);
+            _renderer.SetPosition(1, bottom_left);
+            _renderer.SetPosition(2, top_left);
             _renderer.SetPosition(3, top_right);
-            _renderer.SetPosition(4, origin);
-            _renderer.SetPosition(5, bottom_left);
-            _renderer.SetPosition(6, origin);
-            _renderer.SetPosition(7, bottom_right);
-            _renderer.SetPosition(8, bottom_left);
-            _renderer.SetPosition(9, top_left);
-            _renderer.SetPosition(10, top_right);
-            _renderer.SetPosition(11, bottom_right);
+            _renderer.SetPosition(4, bottom_right);
+
+            //_renderer.SetPosition(0, origin);
+            //_renderer.SetPosition(1, top_left);
+            //_renderer.SetPosition(2, origin);
+            //_renderer.SetPosition(3, top_right);
+            //_renderer.SetPosition(4, origin);
+            //_renderer.SetPosition(5, bottom_left);
+            //_renderer.SetPosition(6, origin);
+            //_renderer.SetPosition(7, bottom_right);
+            //_renderer.SetPosition(8, bottom_left);
+            //_renderer.SetPosition(9, top_left);
+            //_renderer.SetPosition(10, top_right);
+            //_renderer.SetPosition(11, bottom_right);
         }
     }
 }
