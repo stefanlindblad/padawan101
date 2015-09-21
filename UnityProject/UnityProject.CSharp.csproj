@@ -257,6 +257,7 @@
     <Compile Include="Assets\Scripts\VolumetricLineRenderer\CannonBehavior.cs" />
     <Compile Include="Assets\Scripts\VolumetricLineRenderer\CreateSinShapedLineStrip.cs" />
     <Compile Include="Assets\Scripts\VolumetricLineRenderer\ShotBehavior.cs" />
+    <Compile Include="Assets\TextFadeInOut.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Environment\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
