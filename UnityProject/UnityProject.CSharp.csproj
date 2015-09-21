@@ -225,6 +225,7 @@
     <Compile Include="Assets\Scripts\AI\MoveOnSphere.cs" />
     <Compile Include="Assets\Scripts\CameraMovement.cs" />
     <Compile Include="Assets\Scripts\LightSaberController.cs" />
+    <Compile Include="Assets\Scripts\MainEngine.cs" />
     <Compile Include="Assets\Scripts\OSC\OSCBundle.cs" />
     <Compile Include="Assets\Scripts\OSC\OSCClient.cs" />
     <Compile Include="Assets\Scripts\OSC\OSCMessage.cs" />
@@ -232,6 +233,15 @@
     <Compile Include="Assets\Scripts\OSC\OSCServer.cs" />
     <Compile Include="Assets\Scripts\OSCHandler.cs" />
     <Compile Include="Assets\Scripts\OSCTestData.cs" />
+    <Compile Include="Assets\VolumetricLines\ExampleScenes\ExampleScripts\CannonBehavior.cs" />
+    <Compile Include="Assets\VolumetricLines\ExampleScenes\ExampleScripts\CreateSinShapedLineStrip.cs" />
+    <Compile Include="Assets\VolumetricLines\ExampleScenes\ExampleScripts\ShotBehavior.cs" />
+    <Compile Include="Assets\VolumetricLines\Scripts\Utils\ExposeProperties.cs" />
+    <Compile Include="Assets\VolumetricLines\Scripts\Utils\ExposePropertyAttribute.cs" />
+    <Compile Include="Assets\VolumetricLines\Scripts\Utils\TransformExtensionMethods.cs" />
+    <Compile Include="Assets\VolumetricLines\Scripts\VolumetricLineBehavior.cs" />
+    <Compile Include="Assets\VolumetricLines\Scripts\VolumetricLineStripBehavior.cs" />
+    <Compile Include="Assets\VolumetricLines\Scripts\VolumetricMultiLineBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Environment\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
@@ -272,6 +282,12 @@
     <None Include="Assets\RAIN\Editor\Shaders\VisualSensorRingShader.shader" />
     <None Include="Assets\RAIN\Editor\Shaders\WaypointShader.shader" />
     <None Include="Assets\RAIN\ReleaseNotes.txt" />
+    <None Include="Assets\VolumetricLines\Shaders\VolumetricLineShaderAdditive.shader" />
+    <None Include="Assets\VolumetricLines\Shaders\VolumetricLineShaderAdditiveFast.shader" />
+    <None Include="Assets\VolumetricLines\Shaders\VolumetricLineShaderAlphaBlended.shader" />
+    <None Include="Assets\VolumetricLines\Shaders\VolumetricLineShaderAlphaBlendedFast.shader" />
+    <None Include="Assets\VolumetricLines\Shaders\VolumetricLineStripShaderAdditive.shader" />
+    <None Include="Assets\VolumetricLines\Shaders\VolumetricLineStripShaderAlphaBlended.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>
