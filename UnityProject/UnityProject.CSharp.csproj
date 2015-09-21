@@ -247,6 +247,7 @@
     <Compile Include="Assets\Scripts\OSC\OSCServer.cs" />
     <Compile Include="Assets\Scripts\OSCHandler.cs" />
     <Compile Include="Assets\Scripts\OSCTestData.cs" />
+    <Compile Include="Assets\Scripts\RandomFromDistribution.cs" />
     <Compile Include="Assets\Scripts\VolumetricLineRenderer\CannonBehavior.cs" />
     <Compile Include="Assets\Scripts\VolumetricLineRenderer\CreateSinShapedLineStrip.cs" />
     <Compile Include="Assets\Scripts\VolumetricLineRenderer\ShotBehavior.cs" />

@@ -79,7 +79,6 @@
   <ItemGroup>
     <Compile Include="Assets\Plugins\RAIN\Editor\ScriptTemplates\ActionTemplate_CS.cs" />
     <Compile Include="Assets\Plugins\RAIN\Editor\ScriptTemplates\DecisionTemplate_CS.cs" />
-    <Compile Include="Assets\Plugins\VolumetricLines\Scripts\Editor\VolumetricLineBehaviorEditor.cs" />
     <Compile Include="Assets\Plugins\VolumetricLines\Scripts\Editor\VolumetricLineStripBehaviorEditor.cs" />
     <Compile Include="Assets\Plugins\VolumetricLines\Scripts\Utils\ExposeProperties.cs" />
     <Compile Include="Assets\Plugins\VolumetricLines\Scripts\Utils\ExposePropertyAttribute.cs" />

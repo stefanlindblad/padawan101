@@ -146,6 +146,7 @@
   <ItemGroup>
     <Compile Include="Assets\Editor\CrossPlatformInput\CrossPlatformInputInitialize.cs" />
     <Compile Include="Assets\Editor\OSCHelper.cs" />
+    <Compile Include="Assets\Editor\VolumetricLineBehaviorEditor.cs" />
     <Compile Include="Assets\LeapMotion\Editor\HandControllerEditor.cs" />
     <Compile Include="Assets\LeapMotion\Editor\LeapImageRetrieverEditor.cs" />
     <Compile Include="Assets\OVR\Editor\OVRBuild.cs" />

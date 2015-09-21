@@ -5,22 +5,9 @@ using VolumetricLines.Utils;
 namespace VolumetricLines
 {
 	/// <summary>
-	/// Render a single volumetric line
-	/// 
-	/// Based on the Volumetric lines algorithm by SÃ©bastien Hillaire
-	/// http://sebastien.hillaire.free.fr/index.php?option=com_content&view=article&id=57&Itemid=74
-	/// 
-	/// Thread in the Unity3D Forum:
-	/// http://forum.unity3d.com/threads/181618-Volumetric-lines
-	/// 
-	/// Unity3D port by Johannes Unterguggenberger
-	/// johannes.unterguggenberger@gmail.com
-	/// 
-	/// Thanks to Michael Probst for support during development.
-	/// 
-	/// Thanks for bugfixes and improvements to Unity Forum User "Mistale"
-	/// http://forum.unity3d.com/members/102350-Mistale
+	/// Render a single volumetric line 
 	/// </summary>
+    
 	[RequireComponent(typeof(MeshFilter))]
 	[RequireComponent(typeof(Renderer))]
 	public class VolumetricLineBehavior : MonoBehaviour 
