@@ -234,12 +234,12 @@
     <Compile Include="Assets\OVR\Scripts\Util\OVRScreenFade.cs" />
     <Compile Include="Assets\OVR\Scripts\Util\OVRUGUI.cs" />
     <Compile Include="Assets\OVR\Scripts\Util\OVRVisionGuide.cs" />
-    <Compile Include="Assets\ScoreTexter.cs" />
     <Compile Include="Assets\Scripts\AI\MoveOnSphere.cs" />
     <Compile Include="Assets\Scripts\CameraMovement.cs" />
     <Compile Include="Assets\Scripts\LeapMotionVolumeRenderer.cs" />
     <Compile Include="Assets\Scripts\LightSaberController.cs" />
     <Compile Include="Assets\Scripts\MainEngine.cs" />
+    <Compile Include="Assets\Scripts\Math\RandomFromDistribution.cs" />
     <Compile Include="Assets\Scripts\OSC\OSCBundle.cs" />
     <Compile Include="Assets\Scripts\OSC\OSCClient.cs" />
     <Compile Include="Assets\Scripts\OSC\OSCMessage.cs" />
@@ -247,7 +247,7 @@
     <Compile Include="Assets\Scripts\OSC\OSCServer.cs" />
     <Compile Include="Assets\Scripts\OSCHandler.cs" />
     <Compile Include="Assets\Scripts\OSCTestData.cs" />
-    <Compile Include="Assets\Scripts\RandomFromDistribution.cs" />
+    <Compile Include="Assets\Scripts\ScoreTexter.cs" />
     <Compile Include="Assets\Scripts\VolumetricLineRenderer\CannonBehavior.cs" />
     <Compile Include="Assets\Scripts\VolumetricLineRenderer\CreateSinShapedLineStrip.cs" />
     <Compile Include="Assets\Scripts\VolumetricLineRenderer\ShotBehavior.cs" />
