@@ -2,11 +2,11 @@
 using System.Collections;
 
 public class ShotBehavior : MonoBehaviour {
-    
+    public AudioSource laserhit;
 	// Use this for initialization
 	void Start () {
-
-	}
+        laserhit = GetComponent<AudioSource>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -18,7 +18,7 @@ public class ShotBehavior : MonoBehaviour {
         {
             // Add score
             GameObject.Find("ScoreText").GetComponent<ScoreTexter>().AddScore(10);
-
+            laserhit.Play();
             // Simple bounce
             Vector3 colNormal = col.transform.forward; //Create the laser sword with every normal "forward" in local coordinates
             Vector3 laserDirection = this.transform.forward;
