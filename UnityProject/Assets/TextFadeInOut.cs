@@ -19,7 +19,7 @@ public class TextFadeInOut : MonoBehaviour
         elapsedTime += Time.deltaTime;
         if (elapsedTime > DisplayTime)
         {
-            speed = 2000f;
+            speed = 99999999999999999999f;
 
             Vector3 movement = new Vector3(0.0f, 1, 1);
 
