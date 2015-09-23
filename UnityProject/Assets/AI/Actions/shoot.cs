@@ -7,14 +7,15 @@ using RAIN.Core;
 [RAINAction]
 public class shoot : RAINAction
 {
-    Transform m_cannonRot;
+    //Transform m_cannonRot;
     Transform m_muzzle;
     GameObject m_shotPrefab;
     Vector3 rndAngle;
+    float spread = 0.0f; //5.0
 
     public override void Start(RAIN.Core.AI ai)
     {
-        m_cannonRot = ai.Body.GetComponent<CannonBehavior>().m_cannonRot;
+        //m_cannonRot = ai.Body.GetComponent<CannonBehavior>().m_cannonRot;
         m_muzzle = ai.Body.GetComponent<CannonBehavior>().m_muzzle;
         m_shotPrefab = ai.Body.GetComponent<CannonBehavior>().m_shotPrefab;
 
@@ -26,8 +27,8 @@ public class shoot : RAINAction
     public override ActionResult Execute(RAIN.Core.AI ai)
     {
         // Make the shot distorted (not so perfect)
-        rndAngle.x = RandomFromDistribution.RandomRangeNormalDistribution(-5.0f, 5.0f, conf_level);
-        rndAngle.y = RandomFromDistribution.RandomRangeNormalDistribution(-5.0f, 5.0f, conf_level);
+        rndAngle.x = RandomFromDistribution.RandomRangeNormalDistribution(-spread, spread, conf_level);
+        rndAngle.y = RandomFromDistribution.RandomRangeNormalDistribution(-spread, spread, conf_level);
 
         Quaternion distortion = Quaternion.Euler(rndAngle.x, rndAngle.y, 0);
         Quaternion direction = m_muzzle.rotation * distortion;
