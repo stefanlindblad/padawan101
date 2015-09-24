@@ -12,15 +12,16 @@ public class ScoreTexter : MonoBehaviour {
 	score=0;
 
 	ScoreText = GetComponent<Text>();
+        ScoreText.text = "Score: 0";
 
 	}
 	void Update()
 	{
-		int n=0;
-		while (++n<10)
-		{
-			AddScore(10);
-		}
+		//int n=0;
+		//while (++n<10)
+		//{
+		//	AddScore(10);
+		//}
 	}
 	public void AddScore(int newScoreValue)
 	{
