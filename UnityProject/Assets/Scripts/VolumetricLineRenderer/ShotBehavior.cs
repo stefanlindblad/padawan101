@@ -3,18 +3,36 @@ using System.Collections;
 
 public class ShotBehavior : MonoBehaviour {
     public AudioSource laserhit;
-	// Use this for initialization
-	void Start () {
+
+    private Collider ls_collider;
+    private MainEngine mainEngine;
+
+    void Awake()
+    {
+        mainEngine = GameObject.Find("__MainEngine").GetComponent<MainEngine>();
+    }
+
+    // Use this for initialization
+    void Start ()
+    {
         laserhit = GetComponent<AudioSource>();
+        ls_collider = GameObject.Find("LightSaber").GetComponent<Collider>();
     }
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+    {
 		transform.position += transform.forward * Time.deltaTime * 100f;
 	}
+
+
     void OnTriggerEnter(Collider col)
     {
-        if (col == GameObject.Find("LightSaber").GetComponent<Collider>())
+        if(ls_collider != null)
+        {
+
+        }
+        if (col == ls_collider)
         {
             // Add score
             GameObject.Find("ScoreText").GetComponent<ScoreTexter>().AddScore(10);

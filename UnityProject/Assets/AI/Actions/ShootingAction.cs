@@ -5,7 +5,7 @@ using RAIN.Action;
 using RAIN.Core;
 
 [RAINAction]
-public class shoot : RAINAction
+public class ShootingAction : RAINAction
 {
     //Transform m_cannonRot;
     Transform m_muzzle;

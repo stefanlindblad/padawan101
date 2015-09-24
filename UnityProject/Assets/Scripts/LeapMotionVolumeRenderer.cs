@@ -29,7 +29,6 @@ public class LeapMotionVolumeRenderer : MonoBehaviour {
 
     void Update()
     {
-        Vector3 origin = _controller.transform.TransformPoint(Vector3.zero);
 
         Vector3 local_top_left = new Vector3(-BOX_WIDTH, BOX_RADIUS, BOX_DEPTH);
         Vector3 top_left = _controller.transform.TransformPoint(BOX_RADIUS * local_top_left.normalized);

@@ -4,6 +4,7 @@ using System.Collections;
 public class MainEngine : MonoBehaviour {
 
 
+
     public enum State
     {
         Intro,
@@ -16,6 +17,13 @@ public class MainEngine : MonoBehaviour {
     private int _points;
     private int _raysDefended;
     private int _life;
+    private GameObject enemyBall;
+    private GameObject introText;
+    private GameObject introCam;
+    private GameObject mainCam;
+    private GameObject ovrCam;
+
+    public bool useOVR = false;
 
     public State GameState()
     {
@@ -24,18 +32,53 @@ public class MainEngine : MonoBehaviour {
 
     void Awake ()
     {
+        enemyBall = GameObject.Find("EnemyBall");
+        introText = GameObject.Find("IntroText");
+        introCam = GameObject.Find("IntroCamera");
+        mainCam = GameObject.Find("MainCamera_Normal");
+        ovrCam = GameObject.Find("MainCamera_OVR");
         ResetGame();
         _gameState = State.Intro;
         OnStateEntering();
+
 	}
-	
 
-
-    void SwitchBall(bool onOff)
+    private void SwitchCamera(string name)
     {
-        //Todo what it possible to turn the ball on or off
-        // off should be that he is either not visible or remaining position
-        // on should mean he is moving and shooting
+        if(name == "Intro")
+        {
+            if (introCam)
+                introCam.SetActive(true);
+            if (mainCam)
+                mainCam.SetActive(false);
+            if (ovrCam)
+                ovrCam.SetActive(false);
+        }
+        else if (name == "Main")
+        {
+            if (introCam)
+                introCam.SetActive(false);
+            if (mainCam)
+                mainCam.SetActive(true);
+            if (ovrCam)
+                ovrCam.SetActive(false);
+        }
+        else if (name == "OVR")
+        {
+            if (introCam)
+                introCam.SetActive(false);
+            if (mainCam)
+                mainCam.SetActive(false);
+            if (ovrCam)
+                ovrCam.SetActive(true);
+        }
+    }
+
+
+    private void SwitchBall(bool onOff)
+    {
+        if (enemyBall)
+            enemyBall.SetActive(onOff);
     }
 
 
@@ -86,13 +129,21 @@ public class MainEngine : MonoBehaviour {
         {
             case State.Intro:
 
-                // What todo as intro;
+                SwitchCamera("Intro");
+                SwitchBall(false);
+                if (introText)
+                {
+                    introText.SetActive(true);
+                    MovingText text = introText.GetComponent<MovingText>();
+                    text.Reset();
+                }
 
                 break;
 
             case State.Fight:
 
-                // what todo while fighting.
+                SwitchBall(true);
+                Debug.Log("Got into Fight State");
 
                 break;
 
@@ -117,7 +168,12 @@ public class MainEngine : MonoBehaviour {
         {
             case State.Intro:
 
-                // What todo as intro;
+                if (introText)
+                    introText.SetActive(false);
+                if (useOVR)
+                    SwitchCamera("OVR");
+                else
+                    SwitchCamera("Main");
 
                 break;
 
@@ -141,10 +197,20 @@ public class MainEngine : MonoBehaviour {
         }
     }
 
+    public void IntroIsOver()
+    {
+
+        Debug.Log("Intro is over.");
+        this.ChangeState(State.Fight);
+
+    }
+
     void Update ()
     {
         OnStateRunning();
-	}
+        if (Input.GetKeyDown(KeyCode.R))
+            ResetGame();
+    }
 
     public int GetLife()
     {
@@ -159,6 +225,11 @@ public class MainEngine : MonoBehaviour {
     public int GetRaysDefended()
     {
         return _raysDefended;
+    }
+
+    public void HitIncoming()
+    {
+
     }
 
     public void GetHit(int impact = 1)
@@ -181,5 +252,8 @@ public class MainEngine : MonoBehaviour {
         _points = 0;
         _raysDefended = 0;
         _life = 20;
+        SwitchBall(false);
+        this.ChangeState(State.Intro);    
+
     }
 }
