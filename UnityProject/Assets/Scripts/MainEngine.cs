@@ -45,7 +45,7 @@ public class MainEngine : MonoBehaviour {
 
     private void SwitchCamera(string name)
     {
-        if(name == "Intro")
+        /*if(name == "Intro")
         {
             if (introCam)
                 introCam.SetActive(true);
@@ -63,7 +63,7 @@ public class MainEngine : MonoBehaviour {
             if (ovrCam)
                 ovrCam.SetActive(false);
         }
-        else if (name == "OVR")
+        else*/ if (name == "OVR")
         {
             if (introCam)
                 introCam.SetActive(false);
@@ -249,6 +249,7 @@ public class MainEngine : MonoBehaviour {
 
     private void ResetGame()
     {
+        GameObject.Find("ScoreText").GetComponent<ScoreTexter>().ResetScore();
         _points = 0;
         _raysDefended = 0;
         _life = 20;
