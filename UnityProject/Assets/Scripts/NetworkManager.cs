@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class NetworkManager : NetworkBehaviour
 {
+    public GameObject mainEngine;
+
     [Header("Spawnable Prefabs")]
     public List<GameObject> prefabs = new List<GameObject> ();
 
@@ -51,7 +53,8 @@ public class NetworkManager : NetworkBehaviour
     // Use this for initialization
     void Start ()
     {
-
+        if (mainEngine)
+            mainEngine.SetActive(true);
     }
 
     // Update is called once per frame

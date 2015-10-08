@@ -12,13 +12,15 @@ public class LightSaberController : NetworkBehaviour
     private Transform t;
     private bool validSettings = false;
 
+    public bool shouldRotate = true;
+    public float rotationSpeed = 1200.0f;
 
 
     void Start ()
     {
         validSettings = false;
-        GameObject cObject = GameObject.Find(LeapMotionController);
-        controller = cObject.GetComponent<HandController>();
+        GameObject cObject = GameObject.Find (LeapMotionController);
+        controller = cObject.GetComponent<HandController> ();
         t = this.gameObject.transform;
 
         if (controller && t)
@@ -28,16 +30,15 @@ public class LightSaberController : NetworkBehaviour
     void Update ()
     {
 
-        t.Rotate(Vector3.forward * 4.0f * Time.deltaTime);
-        t.Rotate(Vector3.right * 4.0f * Time.deltaTime);
+        if (shouldRotate)
+            t.Rotate (Vector3.forward * this.rotationSpeed * Time.deltaTime);
+        //t.Rotate(Vector3.right * this.rotationSpeed * Time.deltaTime);
 
-        if (validSettings)
-        {
+        if (validSettings) {
             HandModel model = null;
 
-            foreach (HandModel hm in controller.GetAllGraphicsHands())
-            {
-                Hand h = hm.GetLeapHand();
+            foreach (HandModel hm in controller.GetAllGraphicsHands()) {
+                Hand h = hm.GetLeapHand ();
 
 
                 // We have a valid right hand
@@ -50,10 +51,9 @@ public class LightSaberController : NetworkBehaviour
             }
 
 
-            if(model != null)
-            {
-                t.position = model.GetPalmPosition();
-                t.rotation = model.GetPalmRotation();
+            if (model != null) {
+                t.position = model.GetPalmPosition ();
+                t.rotation = model.GetPalmRotation ();
             }
 
         }
