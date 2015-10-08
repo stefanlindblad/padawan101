@@ -9,7 +9,7 @@ public class ShotBehavior : MonoBehaviour {
 
     void Awake()
     {
-        mainEngine = GameObject.Find("__MainEngine").GetComponent<MainEngine>();
+    //    mainEngine = GameObject.Find("__MainEngine").GetComponent<MainEngine>();
     }
 
     // Use this for initialization
