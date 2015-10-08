@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 using Leap;
 
-public class LightSaberController : MonoBehaviour
-
+public class LightSaberController : NetworkBehaviour
 {
     public string LeapMotionController = "";
     public bool UseRightHand = true;
@@ -14,7 +14,7 @@ public class LightSaberController : MonoBehaviour
 
 
 
-	void Start ()
+    void Start ()
     {
         validSettings = false;
         GameObject cObject = GameObject.Find(LeapMotionController);
@@ -23,10 +23,14 @@ public class LightSaberController : MonoBehaviour
 
         if (controller && t)
             validSettings = true;
-	}
-	
-	void Update ()
+    }
+
+    void Update ()
     {
+
+        t.Rotate(Vector3.forward * 4.0f * Time.deltaTime);
+        t.Rotate(Vector3.right * 4.0f * Time.deltaTime);
+
         if (validSettings)
         {
             HandModel model = null;
@@ -39,7 +43,7 @@ public class LightSaberController : MonoBehaviour
                 // We have a valid right hand
                 if (h.IsValid && h.IsRight && UseRightHand)
                     model = hm;
-                    
+
                 // we have a valid left hand
                 else if (h.IsValid && !h.IsRight && !UseRightHand)
                     model = hm;

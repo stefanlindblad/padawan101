@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
+using System;
 
-public class MainEngine : MonoBehaviour {
-
+public class MainEngine : MonoBehaviour
+{
 
 
     public enum State
@@ -10,20 +12,42 @@ public class MainEngine : MonoBehaviour {
         Intro,
         Fight,
         Loose,
-        Win
+        Win,
+        NetworkSetup,
+        Spectating
     };
 
     private State _gameState;
     private int _points;
     private int _raysDefended;
     private int _life;
-    private GameObject enemyBall;
-    private GameObject introText;
-    private GameObject introCam;
-    private GameObject mainCam;
-    private GameObject ovrCam;
+    private float _introTimePassed;
 
+    private GameObject enemyBall;
+    private GameObject ls;
+    private GameObject introText;
+    private NetworkManager networkManager;
+
+
+    [Header("Host prefabs")]
+    public GameObject lightSaberPrefab;
+    public GameObject enemyBallPrefab;
+
+
+    [Header("Cameras and rigs")]
+    public GameObject introCam;
+    public GameObject mainCam;
+    public GameObject ovrCam;
+    public GameObject specCam;
+
+    public GameObject freeLookCameraRig;
+
+
+    [Header("Flags")]
     public bool useOVR = false;
+
+    /* Constants */
+    private const float INTRO_LENGTH = 10.0f; // seconds
 
     public State GameState()
     {
@@ -32,58 +56,33 @@ public class MainEngine : MonoBehaviour {
 
     void Awake ()
     {
-        enemyBall = GameObject.Find("EnemyBall");
         introText = GameObject.Find("IntroText");
-        introCam = GameObject.Find("IntroCamera");
-        mainCam = GameObject.Find("MainCamera_Normal");
-        ovrCam = GameObject.Find("MainCamera_OVR");
-        ResetGame();
-        _gameState = State.Intro;
+
+        networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
+
+        _gameState = State.NetworkSetup;
         OnStateEntering();
-
-	}
-
-    private void SwitchCamera(string name)
-    {
-        /*if(name == "Intro")
-        {
-            if (introCam)
-                introCam.SetActive(true);
-            if (mainCam)
-                mainCam.SetActive(false);
-            if (ovrCam)
-                ovrCam.SetActive(false);
-        }
-        else if (name == "Main")
-        {
-            if (introCam)
-                introCam.SetActive(false);
-            if (mainCam)
-                mainCam.SetActive(true);
-            if (ovrCam)
-                ovrCam.SetActive(false);
-        }
-        else*/ if (name == "OVR")
-        {
-            if (introCam)
-                introCam.SetActive(false);
-            if (mainCam)
-                mainCam.SetActive(false);
-            if (ovrCam)
-                ovrCam.SetActive(true);
-        }
     }
 
-
-    private void SwitchBall(bool onOff)
+    private void SwitchCamera(GameObject camera)
     {
-        if (enemyBall)
-            enemyBall.SetActive(onOff);
+        if (!camera) {
+            Debug.Log("Camera not found. (" + camera + ")");
+            return;
+        }
+
+        GameObject[] cameras = GameObject.FindGameObjectsWithTag("MainCamera");
+        foreach (GameObject cam in cameras)
+        {
+            cam.SetActive(false);
+        }
+        camera.SetActive(true);
     }
 
 
     private void ChangeState(State state)
     {
+        Debug.Log("Switching from " + StateName(GameState()) + " to " + StateName(state) + ".");
         OnStateExiting();
         _gameState = state;
         OnStateEntering();
@@ -97,8 +96,9 @@ public class MainEngine : MonoBehaviour {
         {
             case State.Intro:
 
-                // What todo as intro;
-                // choose intro camera as main camera...
+                this._introTimePassed += Time.fixedDeltaTime;
+                if (this._introTimePassed > MainEngine.INTRO_LENGTH)
+                    ChangeState(State.Fight);
 
                 break;
 
@@ -119,6 +119,24 @@ public class MainEngine : MonoBehaviour {
                 // What todo if the player looses.
 
                 break;
+
+            case State.NetworkSetup:
+                NetworkSetupUpdate();
+                break;
+
+            case State.Spectating:
+                SpectatorCameraControl();
+                break;
+        }
+    }
+
+    void NetworkSetupUpdate() {
+        if (Input.GetKey(KeyCode.H)) {
+            networkManager.SetupHost();
+            ChangeState(State.Intro);
+        } else if (Input.GetKey(KeyCode.C)) {
+            networkManager.SetupClient();
+            ChangeState(State.Spectating);
         }
     }
 
@@ -128,9 +146,8 @@ public class MainEngine : MonoBehaviour {
         switch (GameState())
         {
             case State.Intro:
-
-                SwitchCamera("Intro");
-                SwitchBall(false);
+                this._introTimePassed = 0.0f;
+                SwitchCamera(this.introCam);
                 if (introText)
                 {
                     introText.SetActive(true);
@@ -141,10 +158,7 @@ public class MainEngine : MonoBehaviour {
                 break;
 
             case State.Fight:
-
-                SwitchBall(true);
-                Debug.Log("Got into Fight State");
-
+                SpawnObjects();
                 break;
 
             case State.Win:
@@ -157,6 +171,14 @@ public class MainEngine : MonoBehaviour {
 
                 // What todo if the player looses.
 
+                break;
+
+            case State.NetworkSetup:
+                Debug.Log("Press H to start Host, press C to start Client.");
+                break;
+            case State.Spectating:
+                freeLookCameraRig.SetActive(true);
+                SwitchCamera(this.specCam);
                 break;
         }
     }
@@ -171,16 +193,15 @@ public class MainEngine : MonoBehaviour {
                 if (introText)
                     introText.SetActive(false);
                 if (useOVR)
-                    SwitchCamera("OVR");
+                    SwitchCamera(this.ovrCam);
                 else
-                    SwitchCamera("Main");
+                    SwitchCamera(this.mainCam);
 
                 break;
 
             case State.Fight:
 
                 // what todo while fighting.
-
                 break;
 
             case State.Win:
@@ -194,15 +215,45 @@ public class MainEngine : MonoBehaviour {
                 // What todo if the player looses.
 
                 break;
+
+            case State.NetworkSetup:
+                break;
+
+            case State.Spectating:
+                freeLookCameraRig.SetActive(false);
+                break;
         }
     }
 
-    public void IntroIsOver()
+    private string StateName(State s)
     {
+        switch (s)
+        {
+            case State.Intro:
+                return "Intro";
 
-        Debug.Log("Intro is over.");
-        this.ChangeState(State.Fight);
+            case State.Fight:
+                return "Fight";
 
+            case State.Win:
+                return "Win";
+
+            case State.Loose:
+                return "Loose";
+
+            case State.NetworkSetup:
+                return "NetworkSetup";
+
+            case State.Spectating:
+                return "Spectating";
+
+        }
+        return "";
+    }
+
+    private void LogState()
+    {
+        Debug.Log(StateName(GameState()));
     }
 
     void Update ()
@@ -210,7 +261,35 @@ public class MainEngine : MonoBehaviour {
         OnStateRunning();
         if (Input.GetKeyDown(KeyCode.R))
             ResetGame();
+        if (Input.GetKeyDown(KeyCode.B)) {
+            enemyBall.SetActive(!enemyBall.activeSelf);
+        }
     }
+
+    public void SpectatorCameraControl() {
+        // TODO
+    }
+
+    public void SpawnObjects()
+    {
+        this.ls = (GameObject) Instantiate(lightSaberPrefab,
+                                           new Vector3(0, 0, 0),
+                                           Quaternion.identity);
+
+        this.enemyBall = (GameObject) Instantiate(enemyBallPrefab,
+                                                  new Vector3(0, 0, 0),
+                                                  Quaternion.identity);
+
+        this.enemyBall.SetActive(true);
+
+        /*
+        var clientConnection = networkManager.GetClient().connection;
+
+        NetworkServer.SpawnWithClientAuthority(ls, clientConnection);
+        NetworkServer.SpawnWithClientAuthority(enemyBall, clientConnection);
+        */
+    }
+
 
     public int GetLife()
     {
@@ -247,14 +326,22 @@ public class MainEngine : MonoBehaviour {
         _raysDefended++;
     }
 
+    private bool hasMadeAJoke = false;
+
     private void ResetGame()
     {
-        GameObject.Find("ScoreText").GetComponent<ScoreTexter>().ResetScore();
+        try {
+            GameObject.Find("ScoreText").GetComponent<ScoreTexter>().ResetScore();
+        } catch (NullReferenceException e) {
+            if (!hasMadeAJoke) {
+                Debug.Log("I will be fixed someday and then everything will be allright. " +
+                          "Pigs will have learnt to fly and hell has since long frozen over.");
+                hasMadeAJoke = true;
+            }
+        }
         _points = 0;
         _raysDefended = 0;
         _life = 20;
-        SwitchBall(false);
-        this.ChangeState(State.Intro);    
 
     }
 }

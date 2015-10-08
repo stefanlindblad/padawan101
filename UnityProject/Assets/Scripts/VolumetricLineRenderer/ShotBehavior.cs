@@ -5,25 +5,21 @@ public class ShotBehavior : MonoBehaviour {
     public AudioSource laserhit;
 
     private Collider ls_collider;
-    private MainEngine mainEngine;
-
-    void Awake()
-    {
-        mainEngine = GameObject.Find("__MainEngine").GetComponent<MainEngine>();
-    }
 
     // Use this for initialization
     void Start ()
     {
         laserhit = GetComponent<AudioSource>();
-        ls_collider = GameObject.Find("LightSaber").GetComponent<Collider>();
+        var ls = GameObject.Find("LightSaber");
+        if (ls)
+            ls_collider = ls.GetComponent<Collider>();
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update ()
     {
-		transform.position += transform.forward * Time.deltaTime * 100f;
-	}
+        transform.position += transform.forward * Time.deltaTime * 100f;
+    }
 
 
     void OnTriggerEnter(Collider col)

@@ -1,8 +1,11 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\OSCTestData.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\MainEngine.cs">
     <Files>
-      <File FileName="Assets\Scripts\OSCTestData.cs" Line="33" Column="1" />
+      <File FileName="Assets\Scripts\MainEngine.cs" Line="160" Column="1" />
+      <File FileName="Assets\Scripts\VolumetricLineRenderer\ShotBehavior.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\NetworkManager.cs" Line="63" Column="1" />
+      <File FileName="Assets\Scripts\LightSaberController.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
