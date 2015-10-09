@@ -13,8 +13,6 @@ public class NetworkManager : NetworkBehaviour
     public int portNumber = 4444;
     public string ipAdress = "127.0.0.1";
 
-
-
     private NetworkClient myClient;
 
     // Create a client and connect to the server port
