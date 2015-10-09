@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
-using System;
+
 
 public class MainEngine : MonoBehaviour
 {
@@ -18,21 +18,13 @@ public class MainEngine : MonoBehaviour
     };
 
     private State _gameState;
-    private int _points;
-    private int _raysDefended;
-    private int _life;
     private float _introTimePassed;
 
-    private GameObject enemyBall;
     private GameObject ls;
     private GameObject introText;
-    private NetworkManager networkManager;
+    private MyNetworkManager networkManager;
 
-
-    [Header("Host prefabs")]
-    public GameObject lightSaberPrefab;
-    public GameObject enemyBallPrefab;
-
+    public PlayerManager player;
 
     [Header("Cameras and rigs")]
     public GameObject introCam;
@@ -58,7 +50,7 @@ public class MainEngine : MonoBehaviour
     {
         introText = GameObject.Find ("IntroText");
 
-        networkManager = GameObject.Find ("NetworkManager").GetComponent<NetworkManager> ();
+        networkManager = GameObject.Find ("MyNetworkManager").GetComponent<MyNetworkManager> ();
 
         _gameState = State.NetworkSetup;
         OnStateEntering ();
@@ -123,7 +115,6 @@ public class MainEngine : MonoBehaviour
                 break;
 
             case State.Spectating:
-                SpectatorCameraControl ();
                 break;
         }
     }
@@ -138,6 +129,7 @@ public class MainEngine : MonoBehaviour
             ChangeState (State.Spectating);
         }
     }
+
 
     // Stuff done once if you enter a state
     void OnStateEntering ()
@@ -155,7 +147,9 @@ public class MainEngine : MonoBehaviour
                 break;
 
             case State.Fight:
-                SpawnObjects ();
+                var playerObj = GameObject.FindWithTag("Player");
+                this.player = playerObj.GetComponent<PlayerManager>();
+                player.CmdSpawnObjects();
                 break;
 
             case State.Win:
@@ -254,89 +248,8 @@ public class MainEngine : MonoBehaviour
     void Update ()
     {
         OnStateRunning ();
-        if (Input.GetKeyDown (KeyCode.R))
-            ResetGame ();
-        if (Input.GetKeyDown (KeyCode.B)) {
-            enemyBall.SetActive (!enemyBall.activeSelf);
-        }
-    }
-
-    public void SpectatorCameraControl ()
-    {
-        // TODO
-    }
-
-    public void SpawnObjects ()
-    {
-        this.ls = (GameObject)Instantiate (lightSaberPrefab,
-                                           new Vector3 (0, 0, 0),
-                                           Quaternion.identity);
-
-        this.enemyBall = (GameObject)Instantiate (enemyBallPrefab,
-                                                  new Vector3 (0, 0, 0),
-                                                  Quaternion.identity);
-
-        this.enemyBall.SetActive (true);
-
-        /*
-          var clientConnection = networkManager.GetClient().connection;
-
-          NetworkServer.SpawnWithClientAuthority(ls, clientConnection);
-          NetworkServer.SpawnWithClientAuthority(enemyBall, clientConnection);
-        */
     }
 
 
-    public int GetLife ()
-    {
-        return _life;
-    }
 
-    public int GetPoints ()
-    {
-        return _points;
-    }
-
-    public int GetRaysDefended ()
-    {
-        return _raysDefended;
-    }
-
-    public void HitIncoming ()
-    {
-
-    }
-
-    public void GetHit (int impact = 1)
-    {
-        _life = _life - impact;
-    }
-
-    public void ScorePoint (int points)
-    {
-        _points = _points + points;
-    }
-
-    public void DefendedRay ()
-    {
-        _raysDefended++;
-    }
-
-    private bool hasMadeAJoke = false;
-
-    private void ResetGame ()
-    {
-        try {
-            GameObject.Find ("ScoreText").GetComponent<ScoreTexter> ().ResetScore ();
-        } catch (NullReferenceException e) {
-            if (!hasMadeAJoke) {
-                Debug.Log ("I will be fixed someday and then everything will be alright. " +
-                           "Pigs will have learnt to fly and hell has since long frozen over.");
-                hasMadeAJoke = true;
-            }
-        }
-        _points = 0;
-        _raysDefended = 0;
-        _life = 20;
-    }
 }

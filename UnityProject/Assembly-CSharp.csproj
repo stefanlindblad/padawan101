@@ -225,7 +225,7 @@
      <Compile Include="Assets\Scripts\LightSaberController.cs" />
      <Compile Include="Assets\Scripts\MainEngine.cs" />
      <Compile Include="Assets\Scripts\Math\RandomFromDistribution.cs" />
-     <Compile Include="Assets\Scripts\NetworkManager.cs" />
+     <Compile Include="Assets\Scripts\MyNetworkManager.cs" />
      <Compile Include="Assets\Scripts\OSC\OSCBundle.cs" />
      <Compile Include="Assets\Scripts\OSC\OSCClient.cs" />
      <Compile Include="Assets\Scripts\OSC\OSCMessage.cs" />
@@ -233,6 +233,7 @@
      <Compile Include="Assets\Scripts\OSC\OSCServer.cs" />
      <Compile Include="Assets\Scripts\OSCHandler.cs" />
      <Compile Include="Assets\Scripts\OSCTestData.cs" />
+     <Compile Include="Assets\Scripts\PlayerManager.cs" />
      <Compile Include="Assets\Scripts\ScoreTexter.cs" />
      <Compile Include="Assets\Scripts\VolumetricLineRenderer\CannonBehavior.cs" />
      <Compile Include="Assets\Scripts\VolumetricLineRenderer\CreateSinShapedLineStrip.cs" />
@@ -295,17 +296,11 @@
  <Reference Include="Assembly-UnityScript-firstpass">
  <HintPath>C:/Users/aerholt/Documents/GitHub/padawan101/UnityProject/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
  </Reference>
- <Reference Include="UnityEngine.Advertisements">
- <HintPath>F:/Program/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
- </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>F:/Program/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>F:/Program/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.Analytics">
- <HintPath>F:/Program/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="LeapCSharp.NET3.5">
  <HintPath>C:/Users/aerholt/Documents/GitHub/padawan101/UnityProject/Assets/Plugins/LeapCSharp.NET3.5.dll</HintPath>
