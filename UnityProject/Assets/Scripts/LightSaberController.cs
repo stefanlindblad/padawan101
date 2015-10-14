@@ -30,16 +30,11 @@ public class LightSaberController : NetworkBehaviour
     void Update ()
     {
 
-        if (shouldRotate)
-            t.Rotate (Vector3.forward * this.rotationSpeed * Time.deltaTime);
-        //t.Rotate(Vector3.right * this.rotationSpeed * Time.deltaTime);
-
         if (validSettings) {
             HandModel model = null;
 
             foreach (HandModel hm in controller.GetAllGraphicsHands()) {
                 Hand h = hm.GetLeapHand ();
-
 
                 // We have a valid right hand
                 if (h.IsValid && h.IsRight && UseRightHand)
@@ -50,12 +45,13 @@ public class LightSaberController : NetworkBehaviour
                     model = hm;
             }
 
-
             if (model != null) {
                 t.position = model.GetPalmPosition ();
                 t.rotation = model.GetPalmRotation ();
             }
 
+        } else if (shouldRotate) {
+            t.Rotate (Vector3.forward * this.rotationSpeed * Time.deltaTime);
         }
     }
 }

@@ -19,6 +19,7 @@ public class MainEngine : MonoBehaviour
 
     private State _gameState;
     private float _introTimePassed;
+    private float _networkSetupTimePassed;
 
     private GameObject ls;
     private GameObject introText;
@@ -40,6 +41,7 @@ public class MainEngine : MonoBehaviour
 
     /* Constants */
     private const float INTRO_LENGTH = 1.0f; // seconds
+    private const float NETWORK_SETUP_MAX_WAIT = 20.0f; // seconds
 
     public State GameState ()
     {
@@ -121,10 +123,14 @@ public class MainEngine : MonoBehaviour
 
     void NetworkSetupUpdate ()
     {
+        this._networkSetupTimePassed += Time.fixedDeltaTime;
+
         if (Input.GetKey (KeyCode.H)) {
             networkManager.SetupHost ();
             ChangeState (State.Intro);
-        } else if (Input.GetKey (KeyCode.C)) {
+        } else if (Input.GetKey (KeyCode.C) ||
+                   this._networkSetupTimePassed >
+                   MainEngine.NETWORK_SETUP_MAX_WAIT) {
             networkManager.SetupClient ();
             ChangeState (State.Spectating);
         }
@@ -165,7 +171,8 @@ public class MainEngine : MonoBehaviour
                 break;
 
             case State.NetworkSetup:
-                Debug.Log ("Press H to start Host, press C to start Client.");
+                this._networkSetupTimePassed = 0.0f;
+                Debug.Log ("Press H to start Host, press C (or wait) to start Client.");
                 break;
             case State.Spectating:
                 freeLookCameraRig.SetActive (true);
