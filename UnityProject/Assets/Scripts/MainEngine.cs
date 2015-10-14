@@ -38,7 +38,7 @@ public class MainEngine : MonoBehaviour
     public int score = 0;
     public int highScore = 0;
 
-    private hasSpawnedObjects = false;
+    private bool hasSpawnedObjects = false;
 
 
     public PlayerManager player;
