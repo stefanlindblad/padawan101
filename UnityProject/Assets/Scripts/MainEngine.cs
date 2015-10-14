@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 using System.Collections;
-
+using System;
 
 public class MainEngine : MonoBehaviour
 {
@@ -22,10 +23,26 @@ public class MainEngine : MonoBehaviour
     private float _networkSetupTimePassed;
 
     private GameObject ls;
-    private GameObject introText;
+    
     private MyNetworkManager networkManager;
 
+    private GameObject introText;
+    private GameObject winText;
+    private Text scoreText;
+    private Text timeText;
+    private Text highScoreText;
+
+
+    // Fight state variables
+    public float timeRemaining = 0f;
+    public int score = 0;
+    public int highScore = 0;
+
+    private hasSpawnedObjects = false;
+
+
     public PlayerManager player;
+    public GameObject winTextPrefab;
 
     [Header("Cameras and rigs")]
     public GameObject introCam;
@@ -42,6 +59,7 @@ public class MainEngine : MonoBehaviour
     /* Constants */
     private const float INTRO_LENGTH = 1.0f; // seconds
     private const float NETWORK_SETUP_MAX_WAIT = 20.0f; // seconds
+    private const int HIT_SCORE =  10;
 
     public State GameState ()
     {
@@ -51,6 +69,12 @@ public class MainEngine : MonoBehaviour
     void Awake ()
     {
         introText = GameObject.Find ("IntroText");
+        winText = (GameObject) Instantiate(winTextPrefab, new Vector3(0f, -1f, 33f), Quaternion.identity);
+        winText.SetActive(false);
+
+        scoreText = GameObject.Find("ScoreText").GetComponent<Text>();
+        highScoreText = GameObject.Find("HighScore").GetComponent<Text>();
+        timeText = GameObject.Find("TimeText").GetComponent<Text>();
 
         networkManager = GameObject.Find ("MyNetworkManager").GetComponent<MyNetworkManager> ();
 
@@ -82,45 +106,6 @@ public class MainEngine : MonoBehaviour
 
     }
 
-    // Stuff done every update step in a state
-    void OnStateRunning ()
-    {
-        switch (GameState ()) {
-            case State.Intro:
-
-                this._introTimePassed += Time.fixedDeltaTime;
-                if (this._introTimePassed > MainEngine.INTRO_LENGTH)
-                    ChangeState (State.Fight);
-
-                break;
-
-            case State.Fight:
-
-                // what todo while fighting.
-
-                break;
-
-            case State.Win:
-
-                // What todo if the player wins.
-
-                break;
-
-            case State.Loose:
-
-                // What todo if the player looses.
-
-                break;
-
-            case State.NetworkSetup:
-                NetworkSetupUpdate ();
-                break;
-
-            case State.Spectating:
-                break;
-        }
-    }
-
     void NetworkSetupUpdate ()
     {
         this._networkSetupTimePassed += Time.fixedDeltaTime;
@@ -134,6 +119,38 @@ public class MainEngine : MonoBehaviour
             networkManager.SetupClient ();
             ChangeState (State.Spectating);
         }
+    }
+
+    void FightUpdate() 
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+            ChangeState(State.Fight);
+
+        if (Input.GetKeyDown(KeyCode.I))
+            ChangeState(State.Intro);
+
+
+        if (timeRemaining <= 0) {
+            ChangeState(State.Win);
+        } else {
+            timeRemaining -= Time.deltaTime;
+        }
+
+        this.timeText.text = "Time left: " + String.Format("{0:F2}", timeRemaining);
+    }
+
+    void WinUpdate() {
+        if (Input.GetKeyDown(KeyCode.R))
+            ChangeState(State.Fight);
+
+        if (Input.GetKeyDown(KeyCode.I))
+            ChangeState(State.Intro);
+    }
+
+    public void AddScore()
+    {
+        score += MainEngine.HIT_SCORE;
+        this.scoreText.text = "Score: " + score;
     }
 
 
@@ -155,13 +172,23 @@ public class MainEngine : MonoBehaviour
             case State.Fight:
                 var playerObj = GameObject.FindWithTag("Player");
                 this.player = playerObj.GetComponent<PlayerManager>();
-                player.CmdSpawnObjects();
+                if (!hasSpawnedObjects) {
+                    player.CmdSpawnObjects();
+                    hasSpawnedObjects = true;
+                }
+
+                this.score = 0;
+                this.timeRemaining = 10.0f;
+
+                this.scoreText.text = "Score: 0";            
+                this.timeText.text = "Time left: 10";
+                this.highScoreText.text = "HighScore: " + this.highScore;
+
+                SwitchCamera (this.mainCam);
                 break;
 
             case State.Win:
-
-                // What todo if the player wins.
-
+                this.winText.SetActive(true);
                 break;
 
             case State.Loose:
@@ -177,6 +204,41 @@ public class MainEngine : MonoBehaviour
             case State.Spectating:
                 freeLookCameraRig.SetActive (true);
                 SwitchCamera (this.specCam);
+                break;
+        }
+    }
+
+    // Stuff done every update step in a state
+    void OnStateRunning ()
+    {
+        switch (GameState ()) {
+            case State.Intro:
+
+                this._introTimePassed += Time.fixedDeltaTime;
+                if (this._introTimePassed > MainEngine.INTRO_LENGTH)
+                    ChangeState (State.Fight);
+
+                break;
+
+            case State.Fight:
+                FightUpdate();
+                break;
+
+            case State.Win:
+                WinUpdate();               
+                break;
+
+            case State.Loose:
+
+                // What todo if the player looses.
+
+                break;
+
+            case State.NetworkSetup:
+                NetworkSetupUpdate ();
+                break;
+
+            case State.Spectating:
                 break;
         }
     }
@@ -197,14 +259,10 @@ public class MainEngine : MonoBehaviour
                 break;
 
             case State.Fight:
-
-                // what todo while fighting.
                 break;
 
             case State.Win:
-
-                // What todo if the player wins.
-
+                this.winText.SetActive(false);
                 break;
 
             case State.Loose:
@@ -256,7 +314,5 @@ public class MainEngine : MonoBehaviour
     {
         OnStateRunning ();
     }
-
-
 
 }

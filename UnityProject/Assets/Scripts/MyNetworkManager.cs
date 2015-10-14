@@ -29,24 +29,26 @@ public class MyNetworkManager : NetworkManager
     public void SetupLocalClient()
     {
         myClient = ClientScene.ConnectLocalServer();
-        myClient.RegisterHandler(MsgType.Connect, OnConnected);
-        ClientScene.Ready(myClient.connection);
-        ClientScene.AddPlayer(0);
+        myClient.RegisterHandler(MsgType.Connect, OnConnectedLocalClient);
+        /*ClientScene.Ready(myClient.connection);*/
+        ClientScene.AddPlayer(myClient.connection, 0);
     }
 
     public NetworkClient GetClient() {
         return myClient;
     }
 
-    public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
-    {
-    }
 
     public void SetupHost()
     {
         Debug.Log("Started server.");
         NetworkServer.Listen(base.networkPort);
         SetupLocalClient();
+    }
+
+    public void OnConnectedLocalClient (NetworkMessage msg)
+    {
+        Debug.Log ("HostId: " + myClient.connection.hostId + " connected.");   
     }
 
     public void OnConnected (NetworkMessage msg)

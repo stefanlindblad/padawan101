@@ -7,6 +7,8 @@ public class ShotBehavior : MonoBehaviour
 
     private Collider ls_collider;
 
+    public MainEngine mainEngine;
+
     // Use this for initialization
     void Start ()
     {
@@ -14,6 +16,11 @@ public class ShotBehavior : MonoBehaviour
         var ls = GameObject.Find ("NetworkedLightSaber");
         if (ls)
             ls_collider = ls.GetComponent<Collider> ();
+        var meobj = GameObject.Find("__MainEngine");
+
+        if (meobj)
+            mainEngine = meobj.GetComponent<MainEngine> ();
+
     }
 
     // Update is called once per frame
@@ -29,8 +36,7 @@ public class ShotBehavior : MonoBehaviour
 
         }
         if (col == ls_collider) {
-            // Add score
-            GameObject.Find ("ScoreText").GetComponent<ScoreTexter> ().AddScore (10);
+            mainEngine.AddScore ();
             laserhit.Play ();
             // Simple bounce
 
