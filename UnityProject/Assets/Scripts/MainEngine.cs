@@ -62,7 +62,7 @@ public class MainEngine : MonoBehaviour
     public bool useOVR = false;
 
     /* Constants */
-    private const float INTRO_LENGTH = 15.0f; // seconds
+    private const float INTRO_LENGTH = 10.0f; // seconds
     private const float NETWORK_SETUP_MAX_WAIT = 20.0f; // seconds
     private const int HIT_SCORE =  10;
 
