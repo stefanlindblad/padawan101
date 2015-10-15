@@ -49,6 +49,11 @@ public class MainEngine : MonoBehaviour
     public GameObject mainCam;
     public GameObject ovrCam;
     public GameObject specCam;
+    private GameObject currentCam;
+    private Vector3 introOVRCamPosition = new Vector3(4.289584f, 413.0703f, 109.5418f);
+    //rot X=15.72058
+    private Vector3 fightOVRCamPosition = new Vector3(0.0f, 0.0f, 0.0f);
+
 
     public GameObject freeLookCameraRig;
 
@@ -57,7 +62,7 @@ public class MainEngine : MonoBehaviour
     public bool useOVR = false;
 
     /* Constants */
-    private const float INTRO_LENGTH = 1.0f; // seconds
+    private const float INTRO_LENGTH = 15.0f; // seconds
     private const float NETWORK_SETUP_MAX_WAIT = 20.0f; // seconds
     private const int HIT_SCORE =  10;
 
@@ -84,6 +89,9 @@ public class MainEngine : MonoBehaviour
 
     private void SwitchCamera (GameObject camera)
     {
+        if (camera == currentCam) {
+            return;
+        }
         if (!camera) {
             Debug.Log ("Camera not found. (" + camera + ")");
             return;
@@ -94,6 +102,7 @@ public class MainEngine : MonoBehaviour
             cam.SetActive (false);
         }
         camera.SetActive (true);
+        currentCam = camera;
     }
 
 
@@ -109,6 +118,9 @@ public class MainEngine : MonoBehaviour
     void NetworkSetupUpdate ()
     {
         this._networkSetupTimePassed += Time.fixedDeltaTime;
+        if (Input.GetKey(KeyCode.O)){
+            useOVR = true;
+        }
 
         if (Input.GetKey (KeyCode.H)) {
             networkManager.SetupHost ();
@@ -160,7 +172,12 @@ public class MainEngine : MonoBehaviour
         switch (GameState ()) {
             case State.Intro:
                 this._introTimePassed = 0.0f;
-                SwitchCamera (this.introCam);
+                if (useOVR){
+                    GameObject.Find("MainCamera_OVR").transform.position = introOVRCamPosition;
+                } else {
+                    SwitchCamera(this.introCam);
+                }
+                
                 if (introText) {
                     introText.SetActive (true);
                     MovingText text = introText.GetComponent<MovingText> ();
@@ -176,15 +193,19 @@ public class MainEngine : MonoBehaviour
                     player.CmdSpawnObjects();
                     hasSpawnedObjects = true;
                 }
-
+                GameObject.Find("MainCamera_OVR").transform.position = fightOVRCamPosition;
                 this.score = 0;
                 this.timeRemaining = 10.0f;
 
                 this.scoreText.text = "Score: 0";            
                 this.timeText.text = "Time left: 10";
                 this.highScoreText.text = "HighScore: " + this.highScore;
+                if (useOVR){
+                    SwitchCamera(this.ovrCam);
+                } else {
+                    SwitchCamera(this.mainCam);
+                }
 
-                SwitchCamera (this.mainCam);
                 break;
 
             case State.Win:
