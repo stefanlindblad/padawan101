@@ -289,12 +289,6 @@
      <None Include="Assets\Cardboard\Resources\SolidColor.shader" />
      <None Include="Assets\Environment\Standard Assets\ParticleSystems\Shaders\PriorityParticleAdd.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\WaypointShader.shader" />
- <Reference Include="Assembly-Boo-firstpass">
- <HintPath>C:/Users/aerholt/Documents/GitHub/padawan101/UnityProject/Library/ScriptAssemblies/Assembly-Boo-firstpass.dll</HintPath>
- </Reference>
- <Reference Include="Assembly-UnityScript-firstpass">
- <HintPath>C:/Users/aerholt/Documents/GitHub/padawan101/UnityProject/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
- </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>F:/Program/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
@@ -320,6 +314,10 @@
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
       <Project>{FDE690F1-626F-FFA0-5754-E83120972A79}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
+    <ProjectReference Include="Assembly-Boo-firstpass.booproj">
+      <Project>{B85A92C5-A42C-8BB0-B9E6-C0B256E57D91}</Project>      <Name>Assembly-Boo-firstpass</Name>    </ProjectReference>
+    <ProjectReference Include="Assembly-UnityScript-firstpass.unityproj">
+      <Project>{5120E47E-05CF-77CB-C2BE-2B2453982161}</Project>      <Name>Assembly-UnityScript-firstpass</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

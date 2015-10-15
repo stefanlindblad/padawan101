@@ -56,7 +56,6 @@
      <None Include="Assets\Plugins\x86_64\donotdelete.txt" />
      <None Include="Assets\Fonts\3DText.shader" />
      <None Include="Assets\Plugins\VolumetricLines\Shaders\VolumetricLineShaderAlphaBlended.shader" />
-     <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\AspectRingShader.shader" />
      <None Include="Assets\LeapMotion\DemoResources\ScrollerText.txt" />
      <None Include="Assets\LeapMotion\readme.txt" />
@@ -91,7 +90,7 @@
      <None Include="Assets\Plugins\VolumetricLines\Shaders\VolumetricLineStripShaderAlphaBlended.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\VisualSensorRingShader.shader" />
      <None Include="Assets\Plugins\x86\donotdelete.txt" />
-     <None Include="Assets\Standard Assets\Cameras\CameraGuidelines.txt" />
+     <None Include="Assets\Environment\Cameras\CameraGuidelines.txt" />
      <None Include="Assets\Plugins\VolumetricLines\Shaders\VolumetricLineShaderAlphaBlendedFast.shader" />
      <None Include="Assets\Plugins\RAIN\ReleaseNotes.txt" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\NavMeshColliderShader.shader" />

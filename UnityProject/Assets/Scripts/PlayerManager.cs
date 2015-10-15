@@ -3,55 +3,58 @@ using UnityEngine.Networking;
 using System.Collections;
 using System;
 
-public class PlayerManager : NetworkBehaviour {
+public class PlayerManager : NetworkBehaviour
+{
 
-    private bool _isLocalPlayer;
-    private GameObject lightSaber;
-    private GameObject enemyBall;
+	private bool _isLocalPlayer;
+	private GameObject lightSaber;
+	private GameObject enemyBall;
 
 
-    private MyNetworkManager networkManager;
+	private MyNetworkManager networkManager;
 
-    [Header("Host prefabs")]
-    public GameObject lightSaberPrefab;
-    public GameObject enemyBallPrefab;
+	[Header("Host prefabs")]
+	public GameObject
+		lightSaberPrefab;
+	public GameObject enemyBallPrefab;
 
-    void Start()
-    {
-        networkManager = GameObject.Find ("MyNetworkManager").GetComponent<MyNetworkManager> ();
-    }
+	void Start ()
+	{
+		networkManager = GameObject.Find ("MyNetworkManager").GetComponent<MyNetworkManager> ();
+	}
 
-    // Update is called once per frame
-    void Update ()
-    {
-        if (!isLocalPlayer) return;
+	// Update is called once per frame
+	void Update ()
+	{
+		if (!isLocalPlayer)
+			return;
 
-        if (Input.GetKeyDown (KeyCode.B)) {
-            CmdToggleEnemyBall();
-        }
-    }
+		if (Input.GetKeyDown (KeyCode.B)) {
+			CmdToggleEnemyBall ();
+		}
+	}
 
-    [Command]
-    public void CmdToggleEnemyBall()
-    {
-        this.enemyBall.SetActive (!this.enemyBall.activeSelf);
-    }
+	[Command]
+	public void CmdToggleEnemyBall ()
+	{
+		this.enemyBall.SetActive (!this.enemyBall.activeSelf);
+	}
 
-    [Command]
-    public void CmdSpawnObjects()
-    {
-        this.lightSaber = (GameObject)Instantiate (lightSaberPrefab,
+	[Command]
+	public void CmdSpawnObjects ()
+	{
+		this.lightSaber = (GameObject)Instantiate (lightSaberPrefab,
                                                    new Vector3 (0, 0, 0),
                                                    Quaternion.identity);
 
-        this.enemyBall = (GameObject)Instantiate (enemyBallPrefab,
+		this.enemyBall = (GameObject)Instantiate (enemyBallPrefab,
                                                   new Vector3 (0, 0, 0),
                                                   Quaternion.identity);
-        this.enemyBall.SetActive(true);
+		this.enemyBall.SetActive (true);
 
-        NetworkServer.Spawn(this.lightSaber);
-        NetworkServer.Spawn(this.enemyBall);
+		NetworkServer.Spawn (this.lightSaber);
+		NetworkServer.Spawn (this.enemyBall);
 
-    }
+	}
 
 }
