@@ -1,260 +1,346 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.UI;
 using System.Collections;
+using System;
 
-public class MainEngine : MonoBehaviour {
+public class MainEngine : MonoBehaviour
+{
 
 
-
-    public enum State
-    {
-        Intro,
-        Fight,
-        Loose,
-        Win
-    };
-
-    private State _gameState;
-    private int _points;
-    private int _raysDefended;
-    private int _life;
-    private GameObject enemyBall;
-    private GameObject introText;
-    private GameObject introCam;
-    private GameObject mainCam;
-    private GameObject ovrCam;
-
-    public bool useOVR = false;
-
-    public State GameState()
-    {
-        return _gameState;
+	public enum State
+	{
+		Intro,
+		Fight,
+		Loose,
+		Win,
+		NetworkSetup,
+		Spectating
     }
+	;
 
-    void Awake ()
-    {
-        enemyBall = GameObject.Find("EnemyBall");
-        introText = GameObject.Find("IntroText");
-        introCam = GameObject.Find("IntroCamera");
-        mainCam = GameObject.Find("MainCamera_Normal");
-        ovrCam = GameObject.Find("MainCamera_OVR");
-        ResetGame();
-        _gameState = State.Intro;
-        OnStateEntering();
+	private State _gameState;
+	private float _introTimePassed;
+	private float _networkSetupTimePassed;
+
+	private GameObject ls;
+    
+	private MyNetworkManager networkManager;
+
+	private GameObject introText;
+	private GameObject winText;
+	private Text scoreText;
+	private Text timeText;
+	private Text highScoreText;
+
+
+	// Fight state variables
+	public float timeRemaining = 0f;
+	public int score = 0;
+	public int highScore = 0;
+
+	private bool hasSpawnedObjects = false;
+
+
+	public PlayerManager player;
+	public GameObject winTextPrefab;
+
+	[Header("Cameras and rigs")]
+	public GameObject
+		introCam;
+	public GameObject mainCam;
+	public GameObject ovrCam;
+	public GameObject specCam;
+	private GameObject currentCam;
+	private Vector3 introOVRCamPosition = new Vector3 (4.289584f, 413.0703f, 109.5418f);
+	//rot X=15.72058
+	private Vector3 fightOVRCamPosition = new Vector3 (0.0f, 0.0f, 0.0f);
+
+
+	public GameObject freeLookCameraRig;
+
+
+	[Header("Flags")]
+	public bool
+		useOVR = false;
+
+	/* Constants */
+	private const float INTRO_LENGTH = 7.0f; // seconds
+	private const float NETWORK_SETUP_MAX_WAIT = 20.0f; // seconds
+	private const int HIT_SCORE = 10;
+
+	public State GameState ()
+	{
+		return _gameState;
+	}
+
+	void Awake ()
+	{
+
+		introText = GameObject.Find ("IntroText");
+		winText = (GameObject)Instantiate (winTextPrefab, new Vector3 (0f, -1f, 33f), Quaternion.identity);
+		winText.SetActive (false);
+
+		scoreText = GameObject.Find ("ScoreText").GetComponent<Text> ();
+		highScoreText = GameObject.Find ("HighScore").GetComponent<Text> ();
+		timeText = GameObject.Find ("TimeText").GetComponent<Text> ();
+
+		networkManager = GameObject.Find ("MyNetworkManager").GetComponent<MyNetworkManager> ();
+
+		_gameState = State.NetworkSetup;
+		OnStateEntering ();
+	}
+
+	private void SwitchCamera (GameObject camera)
+	{
+		if (camera == currentCam) {
+			return;
+		}
+		if (!camera) {
+			Debug.Log ("Camera not found. (" + camera + ")");
+			return;
+		}
+
+		GameObject[] cameras = GameObject.FindGameObjectsWithTag ("MainCamera");
+		foreach (GameObject cam in cameras) {
+			cam.SetActive (false);
+		}
+		camera.SetActive (true);
+		currentCam = camera;
+	}
+
+
+	private void ChangeState (State state)
+	{
+		Debug.Log ("Switching from " + StateName (GameState ()) + " to " + StateName (state) + ".");
+		OnStateExiting ();
+		_gameState = state;
+		OnStateEntering ();
 
 	}
 
-    private void SwitchCamera(string name)
-    {
-        /*if(name == "Intro")
-        {
-            if (introCam)
-                introCam.SetActive(true);
-            if (mainCam)
-                mainCam.SetActive(false);
-            if (ovrCam)
-                ovrCam.SetActive(false);
-        }
-        else if (name == "Main")
-        {
-            if (introCam)
-                introCam.SetActive(false);
-            if (mainCam)
-                mainCam.SetActive(true);
-            if (ovrCam)
-                ovrCam.SetActive(false);
-        }
-        else*/ if (name == "OVR")
-        {
-            if (introCam)
-                introCam.SetActive(false);
-            if (mainCam)
-                mainCam.SetActive(false);
-            if (ovrCam)
-                ovrCam.SetActive(true);
-        }
-    }
+	void NetworkSetupUpdate ()
+	{
+		this._networkSetupTimePassed += Time.fixedDeltaTime;
+		if (Input.GetKey (KeyCode.O)) {
+			useOVR = true;
+		}
+
+		if (Input.GetKey (KeyCode.H)) {
+			networkManager.SetupHost ();
+			ChangeState (State.Intro);
+		} else if (Input.GetKey (KeyCode.C) ||
+			this._networkSetupTimePassed >
+			MainEngine.NETWORK_SETUP_MAX_WAIT) {
+			networkManager.SetupClient ();
+			ChangeState (State.Spectating);
+		}
+	}
+
+	void FightUpdate ()
+	{
+		if (Input.GetKeyDown (KeyCode.R))
+			ChangeState (State.Fight);
+
+		if (Input.GetKeyDown (KeyCode.I))
+			ChangeState (State.Intro);
 
 
-    private void SwitchBall(bool onOff)
-    {
-        if (enemyBall)
-            enemyBall.SetActive(onOff);
-    }
+		if (timeRemaining <= 0) {
+			ChangeState (State.Win);
+		} else {
+			timeRemaining -= Time.deltaTime;
+		}
+
+		this.timeText.text = "Time left: " + String.Format ("{0:F2}", timeRemaining);
+	}
+
+	void WinUpdate ()
+	{
+		if (Input.GetKeyDown (KeyCode.R))
+			ChangeState (State.Fight);
+
+		if (Input.GetKeyDown (KeyCode.I))
+			ChangeState (State.Intro);
+	}
+
+	public void AddScore ()
+	{
+		score += MainEngine.HIT_SCORE;
+		this.scoreText.text = "Score: " + score;
+	}
 
 
-    private void ChangeState(State state)
-    {
-        OnStateExiting();
-        _gameState = state;
-        OnStateEntering();
+	// Stuff done once if you enter a state
+	void OnStateEntering ()
+	{
+		switch (GameState ()) {
+		case State.Intro:
+			this._introTimePassed = 0.0f;
+			if (useOVR) {
+				this.ovrCam.transform.position = introOVRCamPosition;
+			} else {
+				SwitchCamera (this.introCam);
+			}
+                
+			if (introText) {
+				introText.SetActive (true);
+				MovingText text = introText.GetComponent<MovingText> ();
+				text.Reset ();
+			}
 
-    }
+			break;
 
-    // Stuff done every update step in a state
-    void OnStateRunning()
-    {
-        switch (GameState())
-        {
-            case State.Intro:
+		case State.Fight:
+			var playerObj = GameObject.FindWithTag ("Player");
+			this.player = playerObj.GetComponent<PlayerManager> ();
+			if (!hasSpawnedObjects) {
+				player.CmdSpawnObjects ();
+				hasSpawnedObjects = true;
+			}
+			if (useOVR) {
+				this.ovrCam.transform.position = fightOVRCamPosition;
+			}
+			this.score = 0;
+			this.timeRemaining = 10.0f;
 
-                // What todo as intro;
-                // choose intro camera as main camera...
+			this.scoreText.text = "Score: 0";            
+			this.timeText.text = "Time left: 10";
+			this.highScoreText.text = "HighScore: " + this.highScore;
+			if (useOVR) {
+				SwitchCamera (this.ovrCam);
+			} else {
+				SwitchCamera (this.mainCam);
+			}
 
-                break;
+			break;
 
-            case State.Fight:
+		case State.Win:
+			this.winText.SetActive (true);
+			break;
 
-                // what todo while fighting.
-
-                break;
-
-            case State.Win:
-
-                // What todo if the player wins.
-
-                break;
-
-            case State.Loose:
-
-                // What todo if the player looses.
-
-                break;
-        }
-    }
-
-    // Stuff done once if you enter a state
-    void OnStateEntering()
-    {
-        switch (GameState())
-        {
-            case State.Intro:
-
-                SwitchCamera("Intro");
-                SwitchBall(false);
-                if (introText)
-                {
-                    introText.SetActive(true);
-                    MovingText text = introText.GetComponent<MovingText>();
-                    text.Reset();
-                }
-
-                break;
-
-            case State.Fight:
-
-                SwitchBall(true);
-                Debug.Log("Got into Fight State");
-
-                break;
-
-            case State.Win:
-
-                // What todo if the player wins.
-
-                break;
-
-            case State.Loose:
+		case State.Loose:
 
                 // What todo if the player looses.
 
-                break;
-        }
-    }
+			break;
 
-    // Stuff done once if you exit a state
-    void OnStateExiting()
-    {
-        switch (GameState())
-        {
-            case State.Intro:
+		case State.NetworkSetup:
+			this._networkSetupTimePassed = 0.0f;
+			Debug.Log ("Press H to start Host, press C (or wait) to start Client.");
+			break;
+		case State.Spectating:
+			freeLookCameraRig.SetActive (true);
+			SwitchCamera (this.specCam);
+			break;
+		}
+	}
 
-                if (introText)
-                    introText.SetActive(false);
-                if (useOVR)
-                    SwitchCamera("OVR");
-                else
-                    SwitchCamera("Main");
+	// Stuff done every update step in a state
+	void OnStateRunning ()
+	{
+		switch (GameState ()) {
+		case State.Intro:
 
-                break;
+			this._introTimePassed += Time.fixedDeltaTime;
+			if (this._introTimePassed > MainEngine.INTRO_LENGTH)
+				ChangeState (State.Fight);
 
-            case State.Fight:
+			break;
 
-                // what todo while fighting.
+		case State.Fight:
+			FightUpdate ();
+			break;
 
-                break;
+		case State.Win:
+			WinUpdate ();               
+			break;
 
-            case State.Win:
-
-                // What todo if the player wins.
-
-                break;
-
-            case State.Loose:
+		case State.Loose:
 
                 // What todo if the player looses.
 
-                break;
-        }
-    }
+			break;
 
-    public void IntroIsOver()
-    {
+		case State.NetworkSetup:
+			NetworkSetupUpdate ();
+			break;
 
-        Debug.Log("Intro is over.");
-        this.ChangeState(State.Fight);
+		case State.Spectating:
+			break;
+		}
+	}
 
-    }
+	// Stuff done once if you exit a state
+	void OnStateExiting ()
+	{
+		switch (GameState ()) {
+		case State.Intro:
 
-    void Update ()
-    {
-        OnStateRunning();
-        if (Input.GetKeyDown(KeyCode.R))
-            ResetGame();
-    }
+			if (introText)
+				introText.SetActive (false);
+			if (useOVR)
+				SwitchCamera (this.ovrCam);
+			else
+				SwitchCamera (this.mainCam);
 
-    public int GetLife()
-    {
-        return _life;
-    }
+			break;
 
-    public int GetPoints()
-    {
-        return _points;
-    }
+		case State.Fight:
+			break;
 
-    public int GetRaysDefended()
-    {
-        return _raysDefended;
-    }
+		case State.Win:
+			this.winText.SetActive (false);
+			break;
 
-    public void HitIncoming()
-    {
+		case State.Loose:
 
-    }
+                // What todo if the player looses.
 
-    public void GetHit(int impact = 1)
-    {
-        _life = _life - impact;
-    }
+			break;
 
-    public void ScorePoint(int points)
-    {
-        _points = _points + points;
-    }
+		case State.NetworkSetup:
+			break;
 
-    public void DefendedRay()
-    {
-        _raysDefended++;
-    }
+		case State.Spectating:
+			freeLookCameraRig.SetActive (false);
+			break;
+		}
+	}
 
-    private void ResetGame()
-    {
-        GameObject.Find("ScoreText").GetComponent<ScoreTexter>().ResetScore();
-        _points = 0;
-        _raysDefended = 0;
-        _life = 20;
-        SwitchBall(false);
-        this.ChangeState(State.Intro);    
+	private string StateName (State s)
+	{
+		switch (s) {
+		case State.Intro:
+			return "Intro";
 
-    }
+		case State.Fight:
+			return "Fight";
+
+		case State.Win:
+			return "Win";
+
+		case State.Loose:
+			return "Loose";
+
+		case State.NetworkSetup:
+			return "NetworkSetup";
+
+		case State.Spectating:
+			return "Spectating";
+
+		}
+		return "";
+	}
+
+	private void LogState ()
+	{
+		Debug.Log (StateName (GameState ()));
+	}
+
+	void Update ()
+	{
+		OnStateRunning ();
+	}
+
 }

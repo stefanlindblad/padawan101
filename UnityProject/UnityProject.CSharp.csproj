@@ -90,6 +90,35 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\AI\Actions\ShootingAction.cs" />
+    <Compile Include="Assets\Cardboard\Legacy\Scripts\CardboardOnGUI.cs" />
+    <Compile Include="Assets\Cardboard\Legacy\Scripts\CardboardOnGUIMouse.cs" />
+    <Compile Include="Assets\Cardboard\Legacy\Scripts\CardboardOnGUIWindow.cs" />
+    <Compile Include="Assets\Cardboard\Legacy\Scripts\LegacyCardboardAndroidDevice.cs" />
+    <Compile Include="Assets\Cardboard\Legacy\Scripts\SkyboxMesh.cs" />
+    <Compile Include="Assets\Cardboard\Legacy\Scripts\StereoLensFlare.cs" />
+    <Compile Include="Assets\Cardboard\Scripts\Cardboard.cs" />
+    <Compile Include="Assets\Cardboard\Scripts\CardboardEye.cs" />
+    <Compile Include="Assets\Cardboard\Scripts\CardboardHead.cs" />
+    <Compile Include="Assets\Cardboard\Scripts\CardboardProfile.cs" />
+    <Compile Include="Assets\Cardboard\Scripts\CardboardUILayer.cs" />
+    <Compile Include="Assets\Cardboard\Scripts\GazeInputModule.cs" />
+    <Compile Include="Assets\Cardboard\Scripts\Pose3D.cs" />
+    <Compile Include="Assets\Cardboard\Scripts\RadialUndistortionEffect.cs" />
+    <Compile Include="Assets\Cardboard\Scripts\StereoController.cs" />
+    <Compile Include="Assets\Cardboard\Scripts\VRDevices\BaseAndroidDevice.cs" />
+    <Compile Include="Assets\Cardboard\Scripts\VRDevices\BaseCardboardDevice.cs" />
+    <Compile Include="Assets\Cardboard\Scripts\VRDevices\BaseVRDevice.cs" />
+    <Compile Include="Assets\Cardboard\Scripts\VRDevices\CardboardAndroidDevice.cs" />
+    <Compile Include="Assets\Cardboard\Scripts\VRDevices\CardboardiOSDevice.cs" />
+    <Compile Include="Assets\Cardboard\Scripts\VRDevices\UnityEditorDevice.cs" />
+    <Compile Include="Assets\Environment\Cameras\Scripts\AbstractTargetFollower.cs" />
+    <Compile Include="Assets\Environment\Cameras\Scripts\AutoCam.cs" />
+    <Compile Include="Assets\Environment\Cameras\Scripts\FreeLookCam.cs" />
+    <Compile Include="Assets\Environment\Cameras\Scripts\HandHeldCam.cs" />
+    <Compile Include="Assets\Environment\Cameras\Scripts\LookatTarget.cs" />
+    <Compile Include="Assets\Environment\Cameras\Scripts\PivotBasedCameraRig.cs" />
+    <Compile Include="Assets\Environment\Cameras\Scripts\ProtectCameraFromWallClip.cs" />
+    <Compile Include="Assets\Environment\Cameras\Scripts\TargetFieldOfView.cs" />
     <Compile Include="Assets\Environment\Standard Assets\CrossPlatformInput\Scripts\AxisTouchButton.cs" />
     <Compile Include="Assets\Environment\Standard Assets\CrossPlatformInput\Scripts\ButtonHandler.cs" />
     <Compile Include="Assets\Environment\Standard Assets\CrossPlatformInput\Scripts\CrossPlatformInputManager.cs" />
@@ -240,6 +269,7 @@
     <Compile Include="Assets\Scripts\LightSaberController.cs" />
     <Compile Include="Assets\Scripts\MainEngine.cs" />
     <Compile Include="Assets\Scripts\Math\RandomFromDistribution.cs" />
+    <Compile Include="Assets\Scripts\MyNetworkManager.cs" />
     <Compile Include="Assets\Scripts\OSC\OSCBundle.cs" />
     <Compile Include="Assets\Scripts\OSC\OSCClient.cs" />
     <Compile Include="Assets\Scripts\OSC\OSCMessage.cs" />
@@ -247,13 +277,18 @@
     <Compile Include="Assets\Scripts\OSC\OSCServer.cs" />
     <Compile Include="Assets\Scripts\OSCHandler.cs" />
     <Compile Include="Assets\Scripts\OSCTestData.cs" />
-    <Compile Include="Assets\Scripts\ScoreTexter.cs" />
+    <Compile Include="Assets\Scripts\PlayerManager.cs" />
     <Compile Include="Assets\Scripts\VolumetricLineRenderer\CannonBehavior.cs" />
     <Compile Include="Assets\Scripts\VolumetricLineRenderer\CreateSinShapedLineStrip.cs" />
     <Compile Include="Assets\Scripts\VolumetricLineRenderer\ShotBehavior.cs" />
     <Compile Include="Assets\TextFadeInOut.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Cardboard\Legacy\Resources\GUIScreen.shader" />
+    <None Include="Assets\Cardboard\Legacy\Resources\SkyboxMesh.shader" />
+    <None Include="Assets\Cardboard\Resources\RadialUndistortionEffect.shader" />
+    <None Include="Assets\Cardboard\Resources\SolidColor.shader" />
+    <None Include="Assets\Environment\Cameras\CameraGuidelines.txt" />
     <None Include="Assets\Environment\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
     <None Include="Assets\Environment\Standard Assets\ParticleSystems\ParticleSystemsGuidelines.txt" />
     <None Include="Assets\Environment\Standard Assets\ParticleSystems\Shaders\PriorityParticleAdd.shader" />
@@ -279,6 +314,8 @@
     <None Include="Assets\NewComputeShader.compute" />
     <None Include="Assets\OVR\Shaders\OVRGUIShader.shader" />
     <None Include="Assets\OVR\Shaders\TextShader3D.shader" />
+    <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
+    <None Include="Assets\Plugins\Legacy\Android\AndroidManifest.xml" />
     <None Include="Assets\Plugins\RAIN\Editor\ScriptTemplates\BehaviorTreeTemplate.xml" />
     <None Include="Assets\Plugins\RAIN\Editor\Shaders\AspectRingShader.shader" />
     <None Include="Assets\Plugins\RAIN\Editor\Shaders\AspectSphereShader.shader" />

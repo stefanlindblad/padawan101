@@ -86,6 +86,11 @@
     <Compile Include="Assets\Plugins\VolumetricLines\Scripts\VolumetricMultiLineBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Cardboard\Legacy\Resources\GUIScreen.shader" />
+    <None Include="Assets\Cardboard\Legacy\Resources\SkyboxMesh.shader" />
+    <None Include="Assets\Cardboard\Resources\RadialUndistortionEffect.shader" />
+    <None Include="Assets\Cardboard\Resources\SolidColor.shader" />
+    <None Include="Assets\Environment\Cameras\CameraGuidelines.txt" />
     <None Include="Assets\Environment\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
     <None Include="Assets\Environment\Standard Assets\ParticleSystems\ParticleSystemsGuidelines.txt" />
     <None Include="Assets\Environment\Standard Assets\ParticleSystems\Shaders\PriorityParticleAdd.shader" />
@@ -111,6 +116,8 @@
     <None Include="Assets\NewComputeShader.compute" />
     <None Include="Assets\OVR\Shaders\OVRGUIShader.shader" />
     <None Include="Assets\OVR\Shaders\TextShader3D.shader" />
+    <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
+    <None Include="Assets\Plugins\Legacy\Android\AndroidManifest.xml" />
     <None Include="Assets\Plugins\RAIN\Editor\ScriptTemplates\BehaviorTreeTemplate.xml" />
     <None Include="Assets\Plugins\RAIN\Editor\Shaders\AspectRingShader.shader" />
     <None Include="Assets\Plugins\RAIN\Editor\Shaders\AspectSphereShader.shader" />
