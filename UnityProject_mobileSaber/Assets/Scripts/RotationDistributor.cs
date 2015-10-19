@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 
 using System;
@@ -24,8 +24,6 @@ public class StateObject
 
 public class RotationDistributor : MonoBehaviour {
 
-    public string standardIP = "192.168.0.14";
-
     //private float speed = 10.0F;
     private int port = 25005;
     private InputField IP;
@@ -33,8 +31,8 @@ public class RotationDistributor : MonoBehaviour {
     private static bool connected = false;
     private Socket client;
     private Transform cubeTransform; 
-    private static Quaternion cubeRotation;
-    private Quaternion quatMult;
+    private static bool vibrate = false;
+
 
     // ManualResetEvent instances signal completion.
     private static ManualResetEvent connectDone = new ManualResetEvent(false);
@@ -47,19 +45,9 @@ public class RotationDistributor : MonoBehaviour {
         button = GameObject.Find("Button");
         cubeTransform = GameObject.Find("Phone").GetComponent<Transform>();
         IP = GameObject.Find("InputField").GetComponent<InputField>();
-        IP.text = standardIP;
-        Input.gyro.updateInterval = 0.01F;
+        IP.text = PlayerPrefs.GetString("IP_Address");
         Input.gyro.enabled = true;
-
-        #if UNITY_IPHONE
-            quatMult = new Quaternion(0f, 0f, 0.7071f, 0.7071f);
-        #endif
-        #if UNITY_ANDROID
-            quatMult = new Quaternion(0f, 0f, 0.7071f, -0.7071f);
-        #endif
-        #if UNITY_EDITOR
-            quatMult = Quaternion.identity;
-        #endif
+        Input.compass.enabled = true;
     }
 
     void Update ()
@@ -73,48 +61,37 @@ public class RotationDistributor : MonoBehaviour {
             button.GetComponentInChildren<Text>().text = "Connect";
         }
 
-        /* Rotation from acceleration first test
-        Vector3 dir = Vector3.zero;
-        dir.x = -Input.acceleration.y;
-        dir.z = Input.acceleration.x;
-        if (dir.sqrMagnitude > 1)
-            dir.Normalize();
-        dir *= Time.deltaTime;
-        Vector3 trans = dir * speed;
-        this.transform.rotation = Quaternion.Euler(trans); */
-        Quaternion rotation;
+        CheckVibrate();
 
-         #if UNITY_IPHONE
-            rotation = Input.gyro.attitude;
-        #endif
-        #if UNITY_ANDROID
-            rotation = Quaternion(Input.gyro.attitude.w, Input.gyro.attitude.x, Input.gyro.attitude.y, Input.gyro.attitude.z);
-        #endif
-        #if UNITY_EDITOR
-            rotation = Quaternion.identity;
-        #endif
+        Vector3 gyroData = Input.gyro.rotationRateUnbiased;
+        Vector3 accelData = Input.acceleration;
+        Vector3 magnetData = Input.compass.rawVector;
 
-        cubeTransform.localRotation = rotation * quatMult;
+        cubeTransform.localRotation = Input.gyro.attitude;
 
         if(connected)
         {
             try
             {
-                Send(client, "<BOF>" + rotation.ToString() + "<EOF>");
+                Send(client, "<BOF>" + "(" + gyroData.x.ToString("000.000") + "," + gyroData.y.ToString("000.000") + "," + gyroData.z.ToString("000.000") + ")"
+                                    + "(" + accelData.x.ToString("000.000") + "," + accelData.y.ToString("0.000") + "," + accelData.z.ToString("000.000") + ")"
+                                    + "(" + magnetData.x.ToString("000.000") + "," + magnetData.y.ToString("000.000") + "," + magnetData.z.ToString("000.000") + ")"
+                                    + "<EOF>");
                 sendDone.WaitOne();
             }
             catch (System.Exception e)
             {
+                connected = false;
                 Debug.Log(e.ToString());
             }
         }
+            
     }
 
     void OnApplicationQuit()
     {
         if(connected)
         {
-            //client.Shutdown(SocketShutdown.Both);
             client.Close();
         }
     }
@@ -130,7 +107,7 @@ public class RotationDistributor : MonoBehaviour {
             {
                 IPAddress ipAdress = IPAddress.Parse(ip);
                 IPEndPoint remoteEP = new IPEndPoint(ipAdress, port);
-
+                PlayerPrefs.SetString ("IP_Address", ip);
                 // Create a TCP/IP socket.
                 client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
@@ -143,19 +120,19 @@ public class RotationDistributor : MonoBehaviour {
             }
             catch (System.Exception e)
             {
+                connected = false;
                 Debug.Log(e.ToString());
             }
         }
         else
         {
-            //client.Shutdown(SocketShutdown.Both);
             client.Close();
             connected = false;
         }
 
     }
 
-     bool SocketConnected(Socket s)
+    private bool SocketConnected(Socket s)
     {
         bool part1 = s.Poll(1000, SelectMode.SelectRead);
         bool part2 = (s.Available == 0);
@@ -178,6 +155,7 @@ public class RotationDistributor : MonoBehaviour {
         }
         catch (Exception e)
         {
+            connected = false;
             Debug.Log(e.ToString());
         }
     }
@@ -190,35 +168,56 @@ public class RotationDistributor : MonoBehaviour {
             Debug.Log("[CLIENT] Connected to Server successfully.");
         }
 
-        else
+        try
         {
-            try
-            {
-                // Retrieve the state object and the client socket 
-                // from the asynchronous state object.
-                StateObject state = (StateObject) ar.AsyncState;
-                Socket client = state.workSocket;
-    
-                    // Read data from the remote device.
-                int bytesRead = client.EndReceive(ar);
+            // Retrieve the state object and the client socket 
+            // from the asynchronous state object.
+            StateObject state = (StateObject) ar.AsyncState;
+            Socket client = state.workSocket;
+            
+            // Read data from the remote device.
+            int bytesRead = client.EndReceive(ar);
 
-                if (bytesRead > 0)
+            if (bytesRead > 0)
+            {
+                // There might be more data, so store the data received so far.
+                state.sb.Append(Encoding.ASCII.GetString(state.buffer,0,bytesRead));
+                // Get the rest of the data.
+                client.BeginReceive(state.buffer,0,StateObject.BufferSize,0,new AsyncCallback(ReceiveCallback), state);
+
+                 // All the data has arrived; put it in response.
+                if (state.sb.Length > 1)
                 {
-                    // There might be more data, so store the data received so far.
-                    state.sb.Append(Encoding.ASCII.GetString(state.buffer,0,bytesRead));
-    
-                        // Get the rest of the data.
-                        client.BeginReceive(state.buffer,0,StateObject.BufferSize,0,new AsyncCallback(ReceiveCallback), state);
-                }
-                else
-                {
+                    String response = state.sb.ToString();
+
+                    // add other actions here if necessary
+                    if(response == "vibration")
+                        vibrate = true;
+
+                    state.sb.Length = 0;
+                    // Signal that all bytes have been received.
                     receiveDone.Set();
                 }
             }
-            catch (Exception e)
+            else
             {
-                Debug.Log(e.ToString());
+                client.BeginReceive(state.buffer,0,StateObject.BufferSize,0,new AsyncCallback(ReceiveCallback), state);
+                receiveDone.Set();
             }
+        }
+        catch (Exception e)
+        {
+            connected = false;
+            Debug.Log(e.ToString());
+        }
+    }
+
+    private void CheckVibrate()
+    {
+        if(vibrate)
+        {
+            Handheld.Vibrate();
+            vibrate = false;
         }
     }
 
@@ -235,17 +234,15 @@ public class RotationDistributor : MonoBehaviour {
         try
         {
             //Retrieve the socket from the state object.
-            //Socket client = (Socket) ar.AsyncState;
-
+            Socket handler = (Socket) ar.AsyncState;
             // Complete sending the data to the remote device.
-            //int bytesSent = client.EndSend(ar);
-            //Debug.Log("Sent " + bytesSent + " bytes to server.");
-
+            handler.EndSend(ar);
             // Signal that all bytes have been sent.
             sendDone.Set();
         }
         catch (Exception e)
         {
+            connected = false;
             Debug.Log(e.ToString());
         }
     }
@@ -267,6 +264,7 @@ public class RotationDistributor : MonoBehaviour {
         }
         catch (Exception e)
         {
+            connected = false;
             Debug.Log(e.ToString());
         }
     }

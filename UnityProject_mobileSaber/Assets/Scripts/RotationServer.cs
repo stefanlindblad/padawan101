@@ -8,24 +8,45 @@ using UnityEngine;
 
 public class RotationServer : MonoBehaviour
 {
-    public string ip = "192.168.0.14";
     private int port = 25005;
     private Transform cubeTransform; 
     private static Quaternion cubeRotation;
-    private Socket listener;
+    private static Socket connectSocket;
     private static RotationServer server;
+    private static string IP;
+    private static Vector3 gyroData;
+    private static Vector3 accelData;
+    private static Vector3 magnetData;
+    private static bool connected;
+
+    private float lastVibrate = 0;
 
     void Start()
     {
+        IP = Network.player.ipAddress;
         cubeTransform = GameObject.Find("Phone").GetComponent<Transform>();
         cubeRotation = Quaternion.identity;
+        connected = false;
         StartListening();
         server = this;
+        lastVibrate = Time.time;
+        gyroData = Vector3.zero;
+        accelData = Vector3.zero;
+        magnetData = Vector3.zero;
+
     }
 
     void Update()
     {
         cubeTransform.localRotation = cubeRotation;
+
+        // Test Vibration every 2sec, remove later
+        if(Time.time - lastVibrate > 2)
+        {
+            VibratePhone();
+            lastVibrate = Time.time;
+        }
+
     }
 
     // Thread signal.
@@ -34,25 +55,26 @@ public class RotationServer : MonoBehaviour
     public void StartListening()
     {
 
-        IPAddress ipAdress = IPAddress.Parse(ip);
+        IPAddress ipAdress = IPAddress.Parse(IP);
         IPEndPoint localEndPoint = new IPEndPoint(ipAdress, port);
 
         // Create a TCP/IP socket.
-        listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
+        connectSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
 
         // Bind the socket to the local endpoint and listen for incoming connections.
         try
         {
-            listener.Bind(localEndPoint);
-            listener.Listen(2);
+            connectSocket.Bind(localEndPoint);
+            connectSocket.Listen(2);
 
                 // Start an asynchronous socket to listen for connections.
                 Debug.Log("[SERVER] Waiting for a connection...");
-                listener.BeginAccept(new AsyncCallback(AcceptCallback), listener );
+                connectSocket.BeginAccept(new AsyncCallback(AcceptCallback), connectSocket );
         }
         catch (Exception e)
         {
             Debug.Log(e.ToString());
+            connected = false;
         }
     }
 
@@ -62,14 +84,16 @@ public class RotationServer : MonoBehaviour
         allDone.Set();
 
         // Get the socket that handles the client request.
-        Socket listener = (Socket) ar.AsyncState;
-        Socket handler = listener.EndAccept(ar);
+        connectSocket = (Socket) ar.AsyncState;
+        connectSocket = connectSocket.EndAccept(ar);
 
         // Create the state object.
         StateObject state = new StateObject();
-        state.workSocket = handler;
-        handler.BeginReceive( state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
-        Send(handler, "Hello!");
+        state.workSocket = connectSocket;
+        connectSocket.BeginReceive( state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
+        Send(connectSocket, "Hello!");
+        Debug.Log("[SERVER] Sent INIT sequence to client.");
+        connected = true;
 
     }
 
@@ -99,7 +123,7 @@ public class RotationServer : MonoBehaviour
                 {
                     // One block of data has been read from the client. Display it on the console.
                     //Debug.Log("[SERVER] Read " + content.Length  + " bytes from socket. Data : " + content + "\n");
-                    getQuaternionFromString(content);
+                    getDataFromString(content);
                     bytesRead = 0;
                     state.sb.Length = 0;
                 }
@@ -114,6 +138,7 @@ public class RotationServer : MonoBehaviour
         }
         catch(Exception e)
         {
+            connected = false;
             Debug.Log(e.ToString());
             server.closeConnection();
         }
@@ -121,36 +146,59 @@ public class RotationServer : MonoBehaviour
 
     private void closeConnection()
     {
-        if(listener != null)
+        if(connectSocket != null)
         {
-            listener.Close();
-            listener = null;
+            connectSocket.Close();
+            connectSocket = null;
         }
         StartListening();
     }
 
-    private static bool getQuaternionFromString(string str)
+    private static void getDataFromString(string str)
     {
         string[] temp1 = str.Split('>');
         string[] temp2 = temp1[1].Split('<');
-
-        string vector = temp2[0];
-
-        if(vector.StartsWith("(") && vector.EndsWith(")"))
+        string vectors = temp2[0];
+        string[] datas = vectors.Split(new Char[] {')', '('} );
+        float x, y, z;
+        if(datas.Length >= 5)
         {
-            string[] temp = vector.Substring(1,vector.Length-2).Split(',');
-            float x = float.Parse(temp[0]);
-            float y = float.Parse(temp[1]);
-            float z = float.Parse(temp[2]);
-            float w = float.Parse(temp[3]);
-            Quaternion inRot = new Quaternion(x,y,z,w);
-            //Vector3 euRot = inRot.eulerAngles;
-            //cubeRotation = Quaternion.Euler(euRot.x, euRot.z, euRot.y);
-            cubeRotation = inRot;
-            return true;
+            if(datas[1].Length > 0)
+            {
+                string[] gyroTemp = datas[1].Split(',');
+                x = float.Parse(gyroTemp[0]);
+                y = float.Parse(gyroTemp[1]);
+                z = float.Parse(gyroTemp[2]);
+                gyroData = new Vector3(x,y,z);
+                Debug.Log("Gyro: " + gyroData);
+            }
+    
+            if(datas[3].Length > 0)
+            {
+                string[] accelTemp = datas[3].Split(',');
+                x = float.Parse(accelTemp[0]);
+                y = float.Parse(accelTemp[1]);
+                z = float.Parse(accelTemp[2]);
+                accelData = new Vector3(x,y,z);
+                Debug.Log("Acceleration: " + accelData);
+            }
+    
+            if(datas[5].Length > 0)
+            {
+                string[] magnetTemp = datas[5].Split(',');
+                x = float.Parse(magnetTemp[0]);
+                y = float.Parse(magnetTemp[1]);
+                z = float.Parse(magnetTemp[2]);
+                magnetData = new Vector3(x,y,z);
+                Debug.Log("Magnetometer: " + magnetData);
+            }
+
         }
-        else
-            return false;
+
+        // Do sensor fusion here
+
+        Quaternion rotation = Quaternion.identity;
+        cubeRotation = rotation;
     }
 
     private static void Send(Socket handler, String data)
@@ -162,20 +210,26 @@ public class RotationServer : MonoBehaviour
         handler.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallback), handler);
     }
 
+    public void VibratePhone()
+    {
+        if(connected)
+        {
+            Send(connectSocket, "vibration");
+        }
+    }
+
     private static void SendCallback(IAsyncResult ar)
     {
         try
         {
             // Retrieve the socket from the state object.
-            //Socket handler = (Socket) ar.AsyncState;
-
+            Socket handler = (Socket) ar.AsyncState;
             // Complete sending the data to the remote device.
-            //int bytesSent = handler.EndSend(ar);
-            //Debug.Log("Sent " + bytesSent + " bytes to client.");
-            Debug.Log("[SERVER] Sent Initialization Sequence to Client.");
+            handler.EndSend(ar);
         }
         catch (Exception e) 
         {
+            connected = false;
             Debug.Log(e.ToString());
             server.closeConnection();
         }
