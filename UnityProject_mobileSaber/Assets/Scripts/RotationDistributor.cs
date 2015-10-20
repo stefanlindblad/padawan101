@@ -8,20 +8,6 @@ using System.Collections;
 using System.Net;
 using System.Net.Sockets;
 
-// State object for receiving data from remote device.
-public class StateObject
-{
-    // Client socket.
-    public Socket workSocket = null;
-    // Size of receive buffer.
-    public const int BufferSize = 256;
-    // Receive buffer.
-    public byte[] buffer = new byte[BufferSize];
-    // Received data string.
-    public StringBuilder sb = new StringBuilder();
-
-}
-
 public class RotationDistributor : MonoBehaviour {
 
     //private float speed = 10.0F;
