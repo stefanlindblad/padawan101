@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class ShotBehavior : MonoBehaviour
+public class ShotBehavior : NetworkBehaviour
 {
 	public AudioSource laserhit;
 
-	private Collider ls_collider;
+	public Collider ls_collider;
 
 	public MainEngine mainEngine;
 
@@ -13,9 +14,7 @@ public class ShotBehavior : MonoBehaviour
 	void Start ()
 	{
 		laserhit = GetComponent<AudioSource> ();
-		var ls = GameObject.Find ("NetworkedLightSaber");
-		if (ls)
-			ls_collider = ls.GetComponent<Collider> ();
+		
 		var meobj = GameObject.Find ("__MainEngine");
 
 		if (meobj)
@@ -27,7 +26,10 @@ public class ShotBehavior : MonoBehaviour
 	void Update ()
 	{
 		transform.position += transform.forward * Time.deltaTime * 100f;
-	}
+        var ls = GameObject.Find("NetworkedLightSaber(Clone)");
+        if (ls)
+            ls_collider = ls.GetComponent<Collider>();
+    }
 
 
 	void OnTriggerEnter (Collider col)

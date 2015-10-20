@@ -17,6 +17,7 @@ public class PlayerManager : NetworkBehaviour
 	public GameObject
 		lightSaberPrefab;
 	public GameObject enemyBallPrefab;
+    public GameObject shotPrefab;
 
 	void Start ()
 	{
@@ -39,7 +40,7 @@ public class PlayerManager : NetworkBehaviour
 	{
 		this.enemyBall.SetActive (!this.enemyBall.activeSelf);
 	}
-
+    
 	[Command]
 	public void CmdSpawnObjects ()
 	{
@@ -56,5 +57,15 @@ public class PlayerManager : NetworkBehaviour
 		NetworkServer.Spawn (this.enemyBall);
 
 	}
+    [Command]
+    public void CmdSpawnShot(Vector3 direction, Quaternion rotation)
+    {
+        var ls_collider = this.lightSaber.GetComponentInChildren<Collider>();
+        GameObject go = GameObject.Instantiate(this.shotPrefab, direction, rotation) as GameObject;
+        var sb = go.GetComponent<ShotBehavior>();
+        sb.ls_collider = ls_collider;
+        NetworkServer.Spawn(go);
+        GameObject.Destroy(go, 5f);
+    }
 
 }

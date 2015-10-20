@@ -18,7 +18,6 @@ public class MainEngine : MonoBehaviour
 		Spectating
     }
 	;
-
 	private State _gameState;
 	private float _introTimePassed;
 	private float _networkSetupTimePassed;
@@ -32,10 +31,10 @@ public class MainEngine : MonoBehaviour
 	private Text scoreText;
 	private Text timeText;
 	private Text highScoreText;
+    private GameObject enemyBall;
 
-
-	// Fight state variables
-	public float timeRemaining = 0f;
+    // Fight state variables
+    public float timeRemaining = 0f;
 	public int score = 0;
 	public int highScore = 0;
 
@@ -80,8 +79,8 @@ public class MainEngine : MonoBehaviour
 		introText = GameObject.Find ("IntroText");
 		winText = (GameObject)Instantiate (winTextPrefab, new Vector3 (0f, -1f, 33f), Quaternion.identity);
 		winText.SetActive (false);
-
-		scoreText = GameObject.Find ("ScoreText").GetComponent<Text> ();
+        this.enemyBall = GameObject.Find("enemyBall");
+        scoreText = GameObject.Find ("ScoreText").GetComponent<Text> ();
 		highScoreText = GameObject.Find ("HighScore").GetComponent<Text> ();
 		timeText = GameObject.Find ("TimeText").GetComponent<Text> ();
 
@@ -139,10 +138,11 @@ public class MainEngine : MonoBehaviour
 
 	void FightUpdate ()
 	{
-		if (Input.GetKeyDown (KeyCode.R))
+		if (Input.GetKeyDown(KeyCode.R)) { 
 			ChangeState (State.Fight);
-
-		if (Input.GetKeyDown (KeyCode.I))
+            player.CmdToggleEnemyBall();
+        }
+        if (Input.GetKeyDown (KeyCode.I))
 			ChangeState (State.Intro);
 
 
@@ -192,13 +192,15 @@ public class MainEngine : MonoBehaviour
 			break;
 
 		case State.Fight:
+
+                player.CmdToggleEnemyBall();  
 			var playerObj = GameObject.FindWithTag ("Player");
 			this.player = playerObj.GetComponent<PlayerManager> ();
 			if (!hasSpawnedObjects) {
 				player.CmdSpawnObjects ();
 				hasSpawnedObjects = true;
 			}
-			if (useOVR) {
+                if (useOVR) {
 				this.ovrCam.transform.position = fightOVRCamPosition;
 			}
 			this.score = 0;
@@ -216,7 +218,8 @@ public class MainEngine : MonoBehaviour
 			break;
 
 		case State.Win:
-			this.winText.SetActive (true);
+                player.CmdToggleEnemyBall();
+                this.winText.SetActive (true);
 			break;
 
 		case State.Loose:
