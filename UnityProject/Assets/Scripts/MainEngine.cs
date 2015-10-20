@@ -32,7 +32,7 @@ public class MainEngine : MonoBehaviour
 	private Text timeText;
 	private Text highScoreText;
     private GameObject enemyBall;
-
+    public GameObject[] enemies;
     // Fight state variables
     public float timeRemaining = 0f;
 	public int score = 0;
@@ -140,13 +140,19 @@ public class MainEngine : MonoBehaviour
 	{
 		if (Input.GetKeyDown(KeyCode.R)) { 
 			ChangeState (State.Fight);
-            player.CmdToggleEnemyBall();
+            player.CmdKillAllBalls();
         }
         if (Input.GetKeyDown (KeyCode.I))
 			ChangeState (State.Intro);
-
+        if (Input.GetKeyDown(KeyCode.A)) {
+            spawnFirstBall();
+        }
+        if (Input.GetKeyDown(KeyCode.K)) {
+            player.CmdKillAllBalls();
+        }
 
 		if (timeRemaining <= 0) {
+            this.timeText.text = "Time left: 0.00";
 			ChangeState (State.Win);
 		} else {
 			timeRemaining -= Time.deltaTime;
@@ -167,9 +173,17 @@ public class MainEngine : MonoBehaviour
 	public void AddScore ()
 	{
 		score += MainEngine.HIT_SCORE;
+        if (score > highScore) {
+            highScore = score;
+            this.highScoreText.text = "Highscore: " + highScore;
+        }
+        
 		this.scoreText.text = "Score: " + score;
 	}
-
+    void spawnFirstBall()
+    {
+        player.CmdSpawnBalls();
+    }
 
 	// Stuff done once if you enter a state
 	void OnStateEntering ()
@@ -192,14 +206,15 @@ public class MainEngine : MonoBehaviour
 			break;
 
 		case State.Fight:
-
-                player.CmdToggleEnemyBall();  
-			var playerObj = GameObject.FindWithTag ("Player");
+                spawnFirstBall();
+                var playerObj = GameObject.FindWithTag ("Player");
 			this.player = playerObj.GetComponent<PlayerManager> ();
 			if (!hasSpawnedObjects) {
 				player.CmdSpawnObjects ();
 				hasSpawnedObjects = true;
-			}
+            } /*else {
+                player.CmdSpawnBalls();
+            }*/
                 if (useOVR) {
 				this.ovrCam.transform.position = fightOVRCamPosition;
 			}
@@ -218,7 +233,8 @@ public class MainEngine : MonoBehaviour
 			break;
 
 		case State.Win:
-                player.CmdToggleEnemyBall();
+                player.CmdKillAllBalls();
+                //player.CmdToggleEnemyBall();
                 this.winText.SetActive (true);
 			break;
 
