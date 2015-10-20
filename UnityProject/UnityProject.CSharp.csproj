@@ -278,6 +278,7 @@
     <Compile Include="Assets\Scripts\OSCHandler.cs" />
     <Compile Include="Assets\Scripts\OSCTestData.cs" />
     <Compile Include="Assets\Scripts\PlayerManager.cs" />
+    <Compile Include="Assets\Scripts\RotationServer.cs" />
     <Compile Include="Assets\Scripts\VolumetricLineRenderer\CannonBehavior.cs" />
     <Compile Include="Assets\Scripts\VolumetricLineRenderer\CreateSinShapedLineStrip.cs" />
     <Compile Include="Assets\Scripts\VolumetricLineRenderer\ShotBehavior.cs" />

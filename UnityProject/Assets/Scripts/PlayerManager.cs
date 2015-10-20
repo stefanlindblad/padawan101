@@ -9,8 +9,6 @@ public class PlayerManager : NetworkBehaviour
 	private bool _isLocalPlayer;
 	private GameObject lightSaber;
 	private GameObject enemyBall;
-    private GameObject enemyBall2;
-    private GameObject enemyBall3;
 
 	private MyNetworkManager networkManager;
 
@@ -67,6 +65,12 @@ public class PlayerManager : NetworkBehaviour
         sb.ls_collider = ls_collider;
         NetworkServer.Spawn(go);
         GameObject.Destroy(go, 5f);
+    }
+    public void setLightsaberRotation(Quaternion rotation) {
+        if (this.lightSaber) {
+            this.lightSaber.transform.rotation = rotation;
+            Debug.Log("Lightsaber rotation"+rotation);
+        }
     }
     [Command]
     public void CmdSpawnBalls()

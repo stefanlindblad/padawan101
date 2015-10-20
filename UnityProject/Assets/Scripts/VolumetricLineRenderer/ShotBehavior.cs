@@ -39,6 +39,7 @@ public class ShotBehavior : NetworkBehaviour
 		}
 		if (col == ls_collider) {
 			mainEngine.AddScore ();
+            RotationServer.VibratePhone();
 			laserhit.Play ();
 			// Simple bounce
 

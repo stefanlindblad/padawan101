@@ -28,6 +28,7 @@ public class MainEngine : MonoBehaviour
 
 	private GameObject introText;
 	private GameObject winText;
+    private RotationServer rotServer;
 	private Text scoreText;
 	private Text timeText;
 	private Text highScoreText;
@@ -65,7 +66,7 @@ public class MainEngine : MonoBehaviour
 
 	/* Constants */
 	private const float INTRO_LENGTH = 7.0f; // seconds
-	private const float NETWORK_SETUP_MAX_WAIT = 20.0f; // seconds
+	private const float NETWORK_SETUP_MAX_WAIT = 2000.0f; // seconds
 	private const int HIT_SCORE = 10;
 
 	public State GameState ()
@@ -83,8 +84,8 @@ public class MainEngine : MonoBehaviour
         scoreText = GameObject.Find ("ScoreText").GetComponent<Text> ();
 		highScoreText = GameObject.Find ("HighScore").GetComponent<Text> ();
 		timeText = GameObject.Find ("TimeText").GetComponent<Text> ();
-
-		networkManager = GameObject.Find ("MyNetworkManager").GetComponent<MyNetworkManager> ();
+        rotServer= GameObject.Find("RotationServer").GetComponent<RotationServer>();
+        networkManager = GameObject.Find ("MyNetworkManager").GetComponent<MyNetworkManager> ();
 
 		_gameState = State.NetworkSetup;
 		OnStateEntering ();
@@ -157,6 +158,7 @@ public class MainEngine : MonoBehaviour
 		} else {
 			timeRemaining -= Time.deltaTime;
 		}
+        player.setLightsaberRotation(rotServer.GetRotation());
 
 		this.timeText.text = "Time left: " + String.Format ("{0:F2}", timeRemaining);
 	}
