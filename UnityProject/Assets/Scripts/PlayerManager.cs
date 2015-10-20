@@ -9,7 +9,8 @@ public class PlayerManager : NetworkBehaviour
 	private bool _isLocalPlayer;
 	private GameObject lightSaber;
 	private GameObject enemyBall;
-
+    private GameObject enemyBall2;
+    private GameObject enemyBall3;
 
 	private MyNetworkManager networkManager;
 
@@ -49,7 +50,7 @@ public class PlayerManager : NetworkBehaviour
                                                    Quaternion.identity);
 
 		this.enemyBall = (GameObject)Instantiate (enemyBallPrefab,
-                                                  new Vector3 (0, 0, 0),
+                                                  new Vector3 (-15f, 6f, 65f),
                                                   Quaternion.identity);
 		this.enemyBall.SetActive (true);
 
@@ -67,5 +68,21 @@ public class PlayerManager : NetworkBehaviour
         NetworkServer.Spawn(go);
         GameObject.Destroy(go, 5f);
     }
-
+    [Command]
+    public void CmdSpawnBalls()
+    {
+        this.enemyBall = (GameObject)Instantiate(enemyBallPrefab,
+                                                  new Vector3(-15f, 6f, 65f),
+                                                  Quaternion.identity);
+        this.enemyBall.SetActive(true);
+        
+        NetworkServer.Spawn(this.enemyBall);
+    }
+    [Command]
+    public void CmdKillAllBalls(){
+        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
+        {
+            GameObject.Destroy(enemy);
+        }
+    }
 }
