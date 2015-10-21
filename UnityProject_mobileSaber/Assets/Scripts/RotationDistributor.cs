@@ -19,7 +19,6 @@ public class RotationDistributor : MonoBehaviour {
     private Transform cubeTransform; 
     private static bool vibrate = false;
 
-
     // ManualResetEvent instances signal completion.
     private static ManualResetEvent connectDone = new ManualResetEvent(false);
     private static ManualResetEvent sendDone = new ManualResetEvent(false);
@@ -49,9 +48,14 @@ public class RotationDistributor : MonoBehaviour {
 
         CheckVibrate();
 
-        Vector3 gyroData = Input.gyro.rotationRateUnbiased;
+        double magnetTime = Input.compass.timestamp;
+        Quaternion gyroAttitudeData = Input.gyro.attitude;
+        Vector3 gyroRotationData = Input.gyro.rotationRateUnbiased;
         Vector3 accelData = Input.acceleration;
+        Vector3 gravityData = Input.gyro.gravity.normalized;
         Vector3 magnetData = Input.compass.rawVector;
+
+
 
         cubeTransform.localRotation = Input.gyro.attitude;
 
@@ -59,10 +63,15 @@ public class RotationDistributor : MonoBehaviour {
         {
             try
             {
-                Send(client, "<BOF>" + "(" + gyroData.x.ToString("000.000") + "," + gyroData.y.ToString("000.000") + "," + gyroData.z.ToString("000.000") + ")"
-                                    + "(" + accelData.x.ToString("000.000") + "," + accelData.y.ToString("0.000") + "," + accelData.z.ToString("000.000") + ")"
-                                    + "(" + magnetData.x.ToString("000.000") + "," + magnetData.y.ToString("000.000") + "," + magnetData.z.ToString("000.000") + ")"
-                                    + "<EOF>");
+                Send(client, "<BOF>" + magnetTime.ToString("000000000.000000000") + "," + gyroAttitudeData.x.ToString("000.000") + ","
+                                     +  gyroAttitudeData.y.ToString("000.000") + "," + gyroAttitudeData.z.ToString("000.000") + ","
+                                     + gyroAttitudeData.w.ToString("000.000") + "," + gyroRotationData.x.ToString("000.000") + "," 
+                                     + gyroRotationData.y.ToString("000.000") + "," + gyroRotationData.z.ToString("000.000") + ","
+                                     + accelData.x.ToString("000.000") + "," + accelData.y.ToString("000.000") + "," 
+                                     + accelData.z.ToString("000.000") + "," + gravityData.x.ToString("000.000") + ","
+                                     + gravityData.y.ToString("000.000") + "," + gravityData.z.ToString("000.000") + ","
+                                     + magnetData.x.ToString("000.000") + "," + magnetData.y.ToString("000.000") + "," 
+                                     + magnetData.z.ToString("000.000") + "<EOF>");
                 sendDone.WaitOne();
             }
             catch (System.Exception e)
@@ -70,8 +79,7 @@ public class RotationDistributor : MonoBehaviour {
                 connected = false;
                 Debug.Log(e.ToString());
             }
-        }
-            
+        }   
     }
 
     void OnApplicationQuit()
@@ -163,15 +171,13 @@ public class RotationDistributor : MonoBehaviour {
             
             // Read data from the remote device.
             int bytesRead = client.EndReceive(ar);
-
             if (bytesRead > 0)
             {
                 // There might be more data, so store the data received so far.
                 state.sb.Append(Encoding.ASCII.GetString(state.buffer,0,bytesRead));
                 // Get the rest of the data.
                 client.BeginReceive(state.buffer,0,StateObject.BufferSize,0,new AsyncCallback(ReceiveCallback), state);
-
-                 // All the data has arrived; put it in response.
+                // All the data has arrived; put it in response.
                 if (state.sb.Length > 1)
                 {
                     String response = state.sb.ToString();
