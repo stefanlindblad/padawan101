@@ -18,7 +18,6 @@ public class MainEngine : MonoBehaviour
 		Spectating
     }
 	;
-
 	private State _gameState;
 	private float _introTimePassed;
 	private float _networkSetupTimePassed;
@@ -29,13 +28,14 @@ public class MainEngine : MonoBehaviour
 
 	private GameObject introText;
 	private GameObject winText;
+    private RotationServer rotServer;
 	private Text scoreText;
 	private Text timeText;
 	private Text highScoreText;
-
-
-	// Fight state variables
-	public float timeRemaining = 0f;
+    private GameObject enemyBall;
+    public GameObject[] enemies;
+    // Fight state variables
+    public float timeRemaining = 0f;
 	public int score = 0;
 	public int highScore = 0;
 
@@ -66,7 +66,7 @@ public class MainEngine : MonoBehaviour
 
 	/* Constants */
 	private const float INTRO_LENGTH = 7.0f; // seconds
-	private const float NETWORK_SETUP_MAX_WAIT = 20.0f; // seconds
+	private const float NETWORK_SETUP_MAX_WAIT = 2000.0f; // seconds
 	private const int HIT_SCORE = 10;
 
 	public State GameState ()
@@ -80,12 +80,12 @@ public class MainEngine : MonoBehaviour
 		introText = GameObject.Find ("IntroText");
 		winText = (GameObject)Instantiate (winTextPrefab, new Vector3 (0f, -1f, 33f), Quaternion.identity);
 		winText.SetActive (false);
-
-		scoreText = GameObject.Find ("ScoreText").GetComponent<Text> ();
+        this.enemyBall = GameObject.Find("enemyBall");
+        scoreText = GameObject.Find ("ScoreText").GetComponent<Text> ();
 		highScoreText = GameObject.Find ("HighScore").GetComponent<Text> ();
 		timeText = GameObject.Find ("TimeText").GetComponent<Text> ();
-
-		networkManager = GameObject.Find ("MyNetworkManager").GetComponent<MyNetworkManager> ();
+        rotServer= GameObject.Find("RotationServer").GetComponent<RotationServer>();
+        networkManager = GameObject.Find ("MyNetworkManager").GetComponent<MyNetworkManager> ();
 
 		_gameState = State.NetworkSetup;
 		OnStateEntering ();
@@ -139,18 +139,26 @@ public class MainEngine : MonoBehaviour
 
 	void FightUpdate ()
 	{
-		if (Input.GetKeyDown (KeyCode.R))
+		if (Input.GetKeyDown(KeyCode.R)) { 
 			ChangeState (State.Fight);
-
-		if (Input.GetKeyDown (KeyCode.I))
+            player.CmdKillAllBalls();
+        }
+        if (Input.GetKeyDown (KeyCode.I))
 			ChangeState (State.Intro);
-
+        if (Input.GetKeyDown(KeyCode.A)) {
+            spawnFirstBall();
+        }
+        if (Input.GetKeyDown(KeyCode.K)) {
+            player.CmdKillAllBalls();
+        }
 
 		if (timeRemaining <= 0) {
+            this.timeText.text = "Time left: 0.00";
 			ChangeState (State.Win);
 		} else {
 			timeRemaining -= Time.deltaTime;
 		}
+        player.setLightsaberRotation(rotServer.GetRotation());
 
 		this.timeText.text = "Time left: " + String.Format ("{0:F2}", timeRemaining);
 	}
@@ -167,9 +175,17 @@ public class MainEngine : MonoBehaviour
 	public void AddScore ()
 	{
 		score += MainEngine.HIT_SCORE;
+        if (score > highScore) {
+            highScore = score;
+            this.highScoreText.text = "Highscore: " + highScore;
+        }
+        
 		this.scoreText.text = "Score: " + score;
 	}
-
+    void spawnFirstBall()
+    {
+        player.CmdSpawnBalls();
+    }
 
 	// Stuff done once if you enter a state
 	void OnStateEntering ()
@@ -192,13 +208,16 @@ public class MainEngine : MonoBehaviour
 			break;
 
 		case State.Fight:
-			var playerObj = GameObject.FindWithTag ("Player");
+                spawnFirstBall();
+                var playerObj = GameObject.FindWithTag ("Player");
 			this.player = playerObj.GetComponent<PlayerManager> ();
 			if (!hasSpawnedObjects) {
 				player.CmdSpawnObjects ();
 				hasSpawnedObjects = true;
-			}
-			if (useOVR) {
+            } /*else {
+                player.CmdSpawnBalls();
+            }*/
+                if (useOVR) {
 				this.ovrCam.transform.position = fightOVRCamPosition;
 			}
 			this.score = 0;
@@ -216,7 +235,9 @@ public class MainEngine : MonoBehaviour
 			break;
 
 		case State.Win:
-			this.winText.SetActive (true);
+                player.CmdKillAllBalls();
+                //player.CmdToggleEnemyBall();
+                this.winText.SetActive (true);
 			break;
 
 		case State.Loose:

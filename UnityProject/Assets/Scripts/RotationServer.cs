@@ -32,17 +32,14 @@ public class RotationServer : MonoBehaviour
     private static Vector3 magnetData;
     private static bool connected;
 
-    private float lastVibrate = 0;
-
     void Start()
     {
         IP = Network.player.ipAddress;
-        cubeTransform = GameObject.Find("Phone").GetComponent<Transform>();
+        //cubeTransform = GameObject.Find("Phone").GetComponent<Transform>();
         cubeRotation = Quaternion.identity;
         connected = false;
         StartListening();
         server = this;
-        lastVibrate = Time.time;
         gyroData = Vector3.zero;
         accelData = Vector3.zero;
         magnetData = Vector3.zero;
@@ -51,14 +48,7 @@ public class RotationServer : MonoBehaviour
 
     void Update()
     {
-        cubeTransform.localRotation = cubeRotation;
-
-        // Test Vibration every 2sec, remove later
-        if(Time.time - lastVibrate > 2)
-        {
-            VibratePhone();
-            lastVibrate = Time.time;
-        }
+        //cubeTransform.localRotation = cubeRotation;
 
     }
 
@@ -67,7 +57,7 @@ public class RotationServer : MonoBehaviour
 
     public void StartListening()
     {
-
+        Debug.Log(IP);
         IPAddress ipAdress = IPAddress.Parse(IP);
         IPEndPoint localEndPoint = new IPEndPoint(ipAdress, port);
 
@@ -210,8 +200,11 @@ public class RotationServer : MonoBehaviour
 
         // Do sensor fusion here
 
-        Quaternion rotation = Quaternion.identity;
-        cubeRotation = rotation;
+        cubeRotation = Quaternion.Euler(gyroData); ;
+    }
+
+    public Quaternion GetRotation() {
+        return cubeRotation;
     }
 
     private static void Send(Socket handler, String data)
@@ -231,7 +224,7 @@ public class RotationServer : MonoBehaviour
         }
     }
 
-    public void VibratePhone()
+    public static void VibratePhone()
     {
         if(connected)
         {

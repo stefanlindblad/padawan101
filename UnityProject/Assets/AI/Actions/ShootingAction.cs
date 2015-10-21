@@ -34,8 +34,11 @@ public class ShootingAction : RAINAction
         Quaternion direction = m_muzzle.rotation * distortion;
 
         // Shoot a ray that disipears after 5 sec
-        GameObject go = GameObject.Instantiate(m_shotPrefab, m_muzzle.position, direction) as GameObject;
-        GameObject.Destroy(go, 5f);
+        //GameObject go = GameObject.Instantiate(m_shotPrefab, m_muzzle.position, direction) as GameObject;
+        // GameObject.Destroy(go, 5f);
+        var playerObj = GameObject.FindWithTag("Player");
+        var player = playerObj.GetComponent<PlayerManager>();
+        player.CmdSpawnShot(m_muzzle.position, direction);
         return ActionResult.SUCCESS;
     }
 
