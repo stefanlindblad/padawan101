@@ -66,10 +66,10 @@ public class PlayerManager : NetworkBehaviour
         NetworkServer.Spawn(go);
         GameObject.Destroy(go, 5f);
     }
-    public void setLightsaberRotation(Quaternion rotation) {
+    public void setLightsaberRotation(Quaternion rotation)
+    {
         if (this.lightSaber) {
             this.lightSaber.transform.rotation = rotation;
-            Debug.Log("Lightsaber rotation"+rotation);
         }
     }
     [Command]

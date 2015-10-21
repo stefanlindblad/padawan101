@@ -38,15 +38,15 @@ public class RotationServer : MonoBehaviour
 
     void Start()
     {
-        GameObject realPhone = GameObject.Find("Phone");
+        GameObject realPhone = GameObject.Find("PhoneData_RotationServer");
 
         // Mode for the real game where no demo assets exist
         if(realPhone == null)
         {
-            GameObject phone = new GameObject("Phone");
+            GameObject phone = new GameObject("PhoneData_RotationServer");
             phoneTransform = phone.transform;
-            GameObject ls = new GameObject("LightSaber");
-            ls.transform.eulerAngles = new Vector3(90f, 180f, 0f);
+            GameObject ls = new GameObject("LightSaberData_RotationServer");
+            ls.transform.eulerAngles = new Vector3(0f, 0f, -90f);
             ls.transform.parent = phoneTransform;
             lightSaberTransform = ls.transform;
         }
@@ -54,7 +54,7 @@ public class RotationServer : MonoBehaviour
         else
         {
             phoneTransform = realPhone.GetComponent<Transform>();
-            lightSaberTransform = GameObject.Find("LightSaber").transform;
+            lightSaberTransform = GameObject.Find("LightSaberData_RotationServer").transform;
         }
             
         gyroAttitude = Quaternion.identity;
@@ -253,7 +253,7 @@ public class RotationServer : MonoBehaviour
         }
     }
 
-    public void VibratePhone()
+    public static void VibratePhone()
     {
         if(connected)
         {
