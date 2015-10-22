@@ -23,10 +23,18 @@ public class MainEngine : MonoBehaviour
 	private float _networkSetupTimePassed;
 
 	private GameObject ls;
-    
-	private MyNetworkManager networkManager;
+    private bool startFading = false;
+    private bool fadeOutStarted = false;
+    private bool introAlmostDone = false;
+    private bool introIsDone = false;
+    public float fadeTime = 0.5f;
 
-	private GameObject introText;
+    private MyNetworkManager networkManager;
+
+    private FadeObjectInOut fadingText;
+    private GameObject introBackground;
+    private GameObject longIntro;
+    private GameObject introText;
 	private GameObject winText;
     private RotationServer rotServer;
 	private Text scoreText;
@@ -38,6 +46,7 @@ public class MainEngine : MonoBehaviour
     public float timeRemaining = 0f;
 	public int score = 0;
 	public int highScore = 0;
+    private int ballsSpawned = 0;
 
 	private bool hasSpawnedObjects = false;
 
@@ -65,7 +74,7 @@ public class MainEngine : MonoBehaviour
 		useOVR = false;
 
 	/* Constants */
-	private const float INTRO_LENGTH = 7.0f; // seconds
+	private const float INTRO_LENGTH = 40.0f; // seconds
 	private const float NETWORK_SETUP_MAX_WAIT = 2000.0f; // seconds
 	private const int HIT_SCORE = 10;
 
@@ -76,8 +85,12 @@ public class MainEngine : MonoBehaviour
 
 	void Awake ()
 	{
-
+        longIntro = GameObject.Find("LongIntro");
+        fadingText = longIntro.GetComponent<FadeObjectInOut>();
+        introBackground = GameObject.Find("IntroBackground");
+        introBackground.SetActive(false);
 		introText = GameObject.Find ("IntroText");
+        introText.SetActive(false);
 		winText = (GameObject)Instantiate (winTextPrefab, new Vector3 (0f, -1f, 33f), Quaternion.identity);
 		winText.SetActive (false);
         this.enemyBall = GameObject.Find("enemyBall");
@@ -136,12 +149,46 @@ public class MainEngine : MonoBehaviour
 			ChangeState (State.Spectating);
 		}
 	}
-
+    void introUpdate()
+    {
+        Debug.Log("Intro started");
+        Debug.Log(fadeOutStarted);
+        this._introTimePassed += Time.fixedDeltaTime;
+        if (this._introTimePassed > MainEngine.INTRO_LENGTH)
+        {
+            Debug.Log("change state");
+            ChangeState(State.Fight);
+        }
+        else
+        {
+            if (startFading == false)
+            {
+                fadingText.FadeIn();
+                startFading = true;
+            }
+            if (this._introTimePassed > 5.0f && fadeOutStarted == false)
+            {
+                introBackground.SetActive(false);
+                Debug.Log("Fading out");
+                fadingText.FadeOut();
+                fadeOutStarted = true;
+            }
+            //else if (fadeOutStarted == true) { Debug.Log("Not anymore"); }
+            if (this._introTimePassed > 4.0f && introIsDone == false)
+            {
+                Debug.Log("Here comes the intro");
+                introText.SetActive(true);
+                MovingText text = introText.GetComponent<MovingText>();
+                text.Reset();
+                introIsDone = true;
+            }
+        }
+    }
 	void FightUpdate ()
 	{
 		if (Input.GetKeyDown(KeyCode.R)) { 
 			ChangeState (State.Fight);
-            player.CmdKillAllBalls();
+            //player.CmdKillAllBalls();
         }
         if (Input.GetKeyDown (KeyCode.I))
 			ChangeState (State.Intro);
@@ -151,7 +198,14 @@ public class MainEngine : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.K)) {
             player.CmdKillAllBalls();
         }
-
+        if (timeRemaining < 40 && ballsSpawned == 1) {
+            player.CmdSpawnBalls();
+            ballsSpawned = 2;
+        }
+        if (timeRemaining < 20 && ballsSpawned == 2) {
+            player.CmdSpawnBalls();
+            ballsSpawned = 3;
+        }
 		if (timeRemaining <= 0) {
             this.timeText.text = "Time left: 0.00";
 			ChangeState (State.Win);
@@ -192,23 +246,37 @@ public class MainEngine : MonoBehaviour
 	{
 		switch (GameState ()) {
 		case State.Intro:
-			this._introTimePassed = 0.0f;
-			if (useOVR) {
-				this.ovrCam.transform.position = introOVRCamPosition;
-			} else {
-				SwitchCamera (this.introCam);
-			}
-                
-			if (introText) {
-				introText.SetActive (true);
-				MovingText text = introText.GetComponent<MovingText> ();
-				text.Reset ();
-			}
+                player.CmdKillAllBalls();
+                introBackground.SetActive(true);
+                this._introTimePassed = 0.0f;
+                if (useOVR)
+                {
+                    this.ovrCam.transform.position = introOVRCamPosition;
+                }
+                else
+                {
+                    SwitchCamera(this.introCam);
+                }
+                if (startFading == true)
+                    startFading = false;
+                if (fadeOutStarted == true)
+                    fadeOutStarted = false;
+                if (introAlmostDone == true)
+                    introAlmostDone = false;
+                if (introIsDone == true)
+                    introIsDone = false;
 
+                //if (introText) {
+                //	introText.SetActive (true);
+                //	MovingText text = introText.GetComponent<MovingText> ();
+                //	text.Reset ();
+                //}
+                Debug.Log("EnterIntro");
+                
 			break;
 
 		case State.Fight:
-                spawnFirstBall();
+                
                 var playerObj = GameObject.FindWithTag ("Player");
 			this.player = playerObj.GetComponent<PlayerManager> ();
 			if (!hasSpawnedObjects) {
@@ -217,11 +285,15 @@ public class MainEngine : MonoBehaviour
             } /*else {
                 player.CmdSpawnBalls();
             }*/
+                player.CmdKillAllBalls();
+                ballsSpawned = 0;
+                player.CmdSpawnBalls();
+                ballsSpawned = 1;
                 if (useOVR) {
 				this.ovrCam.transform.position = fightOVRCamPosition;
 			}
 			this.score = 0;
-			this.timeRemaining = 10.0f;
+			this.timeRemaining = 60.0f;
 
 			this.scoreText.text = "Score: 0";            
 			this.timeText.text = "Time left: 10";
@@ -263,11 +335,11 @@ public class MainEngine : MonoBehaviour
 		switch (GameState ()) {
 		case State.Intro:
 
-			this._introTimePassed += Time.fixedDeltaTime;
-			if (this._introTimePassed > MainEngine.INTRO_LENGTH)
-				ChangeState (State.Fight);
-
-			break;
+                //this._introTimePassed += Time.fixedDeltaTime;
+                //if (this._introTimePassed > MainEngine.INTRO_LENGTH)
+                //	ChangeState (State.Fight);
+                introUpdate();
+                break;
 
 		case State.Fight:
 			FightUpdate ();
