@@ -72,6 +72,14 @@ public class PlayerManager : NetworkBehaviour
             this.lightSaber.transform.rotation = rotation;
         }
     }
+    public void playAccelerationSound(float acceleration)
+    {
+        if(acceleration <= 10)
+        {
+            //play sound and stuff;
+        }
+    }
+
     [Command]
     public void CmdSpawnBalls()
     {

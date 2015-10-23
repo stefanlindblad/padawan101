@@ -159,6 +159,8 @@ public class MainEngine : MonoBehaviour
 			timeRemaining -= Time.deltaTime;
 		}
         player.setLightsaberRotation(rotServer.GetRotation());
+        Debug.Log("Acceleration:" + rotServer.GetAcceleration());
+        player.playAccelerationSound(rotServer.GetAcceleration());
 
 		this.timeText.text = "Time left: " + String.Format ("{0:F2}", timeRemaining);
 	}

@@ -25,6 +25,7 @@ public class RotationServer : MonoBehaviour
     private Transform phoneTransform;
     private Transform lightSaberTransform; 
     private static Quaternion gyroAttitude;
+    private static Vector3 accelerationData;
     private Quaternion realRotation;
     private static Socket connectSocket;
     private static RotationServer server;
@@ -56,7 +57,7 @@ public class RotationServer : MonoBehaviour
             phoneTransform = realPhone.GetComponent<Transform>();
             lightSaberTransform = GameObject.Find("LightSaberData_RotationServer").transform;
         }
-            
+        accelerationData = Vector3.zero;
         gyroAttitude = Quaternion.identity;
         realRotation = Quaternion.identity;
         initialYAngle = transform.eulerAngles.y;
@@ -193,6 +194,11 @@ public class RotationServer : MonoBehaviour
         return realRotation;
     }
 
+    public float GetAcceleration()
+    {
+        return accelerationData.magnitude;
+    }
+
     private static void getDataFromString(string str)
     {
         string[] temp1 = str.Split('>');
@@ -234,6 +240,8 @@ public class RotationServer : MonoBehaviour
         }
 
         gyroAttitude = gyroAttitudeData;
+        accelerationData = accelData;
+
     }
 
     private static void Send(Socket handler, String data)
