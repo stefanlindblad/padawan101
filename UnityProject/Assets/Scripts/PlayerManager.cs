@@ -74,7 +74,7 @@ public class PlayerManager : NetworkBehaviour
     }
     public void playAccelerationSound(float acceleration)
     {
-        if(acceleration <= 10)
+        if(acceleration > 1.5f)
         {
             //play sound and stuff;
         }
