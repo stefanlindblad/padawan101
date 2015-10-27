@@ -186,9 +186,8 @@ public class RotationDistributor : MonoBehaviour {
                 }
             }
             else
-            {
-                client.BeginReceive(state.buffer,0,StateObject.BufferSize,0,new AsyncCallback(ReceiveCallback), state);
-                receiveDone.Set();
+            {   
+                connected = false;
             }
         }
         catch (Exception e)

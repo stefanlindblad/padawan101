@@ -163,12 +163,9 @@ public class MainEngine : MonoBehaviour
 	}
     void introUpdate()
     {
-        Debug.Log("Intro started");
-        Debug.Log(fadeOutStarted);
         this._introTimePassed += Time.fixedDeltaTime;
         if (this._introTimePassed > MainEngine.INTRO_LENGTH)
         {
-            Debug.Log("change state");
             ChangeState(State.Fight);
         }
         else
@@ -181,14 +178,12 @@ public class MainEngine : MonoBehaviour
             if (this._introTimePassed > 5.0f && fadeOutStarted == false)
             {
                 introBackground.SetActive(false);
-                Debug.Log("Fading out");
                 fadingText.FadeOut();
                 fadeOutStarted = true;
             }
             //else if (fadeOutStarted == true) { Debug.Log("Not anymore"); }
             if (this._introTimePassed > 4.0f && introIsDone == false)
             {
-                Debug.Log("Here comes the intro");
                 introText.SetActive(true);
                 MovingText text = introText.GetComponent<MovingText>();
                 text.Reset();

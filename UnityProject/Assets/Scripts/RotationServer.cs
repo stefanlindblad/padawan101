@@ -136,7 +136,7 @@ public class RotationServer : MonoBehaviour
             connectSocket.Listen(2);
 
                 // Start an asynchronous socket to listen for connections.
-                Debug.Log("[SERVER] Waiting for a connection...");
+                Debug.Log("[ROTATION_SERVER] Waiting for a connection...");
                 connectSocket.BeginAccept(new AsyncCallback(AcceptCallback), connectSocket );
                 listening = true;
         }
@@ -161,8 +161,7 @@ public class RotationServer : MonoBehaviour
         state.workSocket = connectSocket;
         connectSocket.BeginReceive( state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
         Send(connectSocket, "Hello!");
-        Debug.Log("[SERVER] Sent INIT sequence to client.");
-        listening = true;
+        Debug.Log("[ROTATION_SERVER] Sent INIT sequence to client.");
 
     }
 
@@ -190,7 +189,7 @@ public class RotationServer : MonoBehaviour
                 if (content.IndexOf("<EOF>") > -1)
                 {
                     // One block of data has been read from the client. Display it on the console.
-                    //Debug.Log("[SERVER] Read " + content.Length  + " bytes from socket. Data : " + content + "\n");
+                    //Debug.Log("[ROTATION_SERVER] Read " + content.Length  + " bytes from socket. Data : " + content + "\n");
                     getDataFromString(content);
                     bytesRead = 0;
                     state.sb.Length = 0;
@@ -206,19 +205,21 @@ public class RotationServer : MonoBehaviour
         }
         catch(Exception e)
         {
-            listening = false;
-            //Debug.Log(e.ToString());
             server.closeConnection();
         }
     }
 
     private void closeConnection()
     {
+        Debug.Log("[ROTATION_SERVER] Closing Connection");
+
         if(connectSocket != null)
         {
             connectSocket.Close();
             connectSocket = null;
         }
+
+        listening = false;
     }
 
     public Quaternion GetRotation()
@@ -288,8 +289,7 @@ public class RotationServer : MonoBehaviour
         }
         catch (Exception e)
         {
-            listening = false;
-            //Debug.Log(e.ToString());
+            server.closeConnection();
         }
     }
 
@@ -312,8 +312,6 @@ public class RotationServer : MonoBehaviour
         }
         catch (Exception e) 
         {
-            listening = false;
-            //Debug.Log(e.ToString());
             server.closeConnection();
         }
     }
