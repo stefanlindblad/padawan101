@@ -222,6 +222,10 @@
      <Compile Include="Assets\Scripts\AI\MoveOnSphere.cs" />
      <Compile Include="Assets\Scripts\CameraMovement.cs" />
      <Compile Include="Assets\Scripts\Kinect\BodySourceManager.cs" />
+     <Compile Include="Assets\Scripts\Kinect\CSML\Complex.cs" />
+     <Compile Include="Assets\Scripts\Kinect\CSML\Matrix.cs" />
+     <Compile Include="Assets\Scripts\Kinect\CharacterManager.cs" />
+     <Compile Include="Assets\Scripts\Kinect\KalmanFilter.cs" />
      <Compile Include="Assets\Scripts\Kinect\KinectManager.cs" />
      <Compile Include="Assets\Scripts\Kinect\testCallKinect.cs" />
      <Compile Include="Assets\Scripts\LeapMotionVolumeRenderer.cs" />
@@ -241,6 +245,7 @@
      <Compile Include="Assets\Scripts\VolumetricLineRenderer\CannonBehavior.cs" />
      <Compile Include="Assets\Scripts\VolumetricLineRenderer\CreateSinShapedLineStrip.cs" />
      <Compile Include="Assets\Scripts\VolumetricLineRenderer\ShotBehavior.cs" />
+     <Compile Include="Assets\TestMotion.cs" />
      <Compile Include="Assets\TextFadeInOut.cs" />
      <None Include="Assets\Cardboard\Legacy\Resources\SkyboxMesh.shader" />
      <None Include="Assets\Plugins\donotdelete.txt" />
@@ -299,17 +304,11 @@
  <Reference Include="Assembly-UnityScript-firstpass">
  <HintPath>D:/Users/viktor/Documents/Skola_KTH/Advanced graphics and interactions/padawan101/UnityProject/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
  </Reference>
- <Reference Include="UnityEngine.Advertisements">
- <HintPath>D:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
- </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>D:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>D:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.Analytics">
- <HintPath>D:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="LeapCSharp.NET3.5">
  <HintPath>D:/Users/viktor/Documents/Skola_KTH/Advanced graphics and interactions/padawan101/UnityProject/Assets/Plugins/LeapCSharp.NET3.5.dll</HintPath>
