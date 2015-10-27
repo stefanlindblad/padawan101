@@ -5,16 +5,16 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{763E01C1-30A1-6A95-047A-9420BA4E2B39}</ProjectGuid>
+    <ProjectGuid>{954B9EDE-EF0A-EE8C-721B-41565588E43D}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AssemblyName>Assembly-CSharp-Editor</AssemblyName>
+    <AssemblyName>Assembly-CSharp-Editor-firstpass</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
     <CompilerResponseFile></CompilerResponseFile>
-    <UnityProjectType>Editor:5</UnityProjectType>
+    <UnityProjectType>EditorPlugins:7</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>5.2.0f3</UnityVersion>
     <RootNamespace></RootNamespace>
@@ -142,23 +142,9 @@
       <Project>{F5F9D48D-6914-C6F2-CF81-CF8D045EAAD0}</Project>
       <Name>UnityProject.CSharp</Name>
     </ProjectReference>
-    <ProjectReference Include="UnityProject.CSharp.Editor.Plugins.csproj">
-      <Project>{954B9EDE-EF0A-EE8C-721B-41565588E43D}</Project>
-      <Name>UnityProject.CSharp.Editor.Plugins</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Cardboard\Editor\CardboardEditor.cs" />
-    <Compile Include="Assets\Cardboard\Editor\StereoControllerEditor.cs" />
-    <Compile Include="Assets\Editor\CrossPlatformInput\CrossPlatformInputInitialize.cs" />
-    <Compile Include="Assets\Editor\OSCHelper.cs" />
-    <Compile Include="Assets\LeapMotion\Editor\HandControllerEditor.cs" />
-    <Compile Include="Assets\LeapMotion\Editor\LeapImageRetrieverEditor.cs" />
-    <Compile Include="Assets\OVR\Editor\OVRBuild.cs" />
-    <Compile Include="Assets\OVR\Editor\OVRGameView.cs" />
-    <Compile Include="Assets\OVR\Editor\OVRPrefabs.cs" />
-    <Compile Include="Assets\OVR\Editor\OVRShimLoader.cs" />
-    <Compile Include="Assets\Shaders\UnityVC\Editor\StandardShaderVCGUI.cs" />
+    <Compile Include="Assets\Standard Assets\Editor\KinectCopyPluginDataHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Cardboard\Legacy\Resources\GUIScreen.shader" />

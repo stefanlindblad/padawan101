@@ -66,12 +66,20 @@ public class PlayerManager : NetworkBehaviour
         NetworkServer.Spawn(go);
         GameObject.Destroy(go, 5f);
     }
-    public void setLightsaberRotation(Quaternion rotation) {
+    public void setLightsaberRotation(Quaternion rotation)
+    {
         if (this.lightSaber) {
             this.lightSaber.transform.rotation = rotation;
-            Debug.Log("Lightsaber rotation"+rotation);
         }
     }
+    public void playAccelerationSound(float acceleration)
+    {
+        if(acceleration > 1.5f)
+        {
+            //play sound and stuff;
+        }
+    }
+
     [Command]
     public void CmdSpawnBalls()
     {

@@ -22,48 +22,80 @@ public class StateObject
 public class RotationServer : MonoBehaviour
 {
     private int port = 25005;
-    private Transform cubeTransform; 
-    private static Quaternion cubeRotation;
+    private Transform phoneTransform;
+    private Transform lightSaberTransform; 
+    private static Quaternion gyroAttitude;
+    private static Vector3 accelerationData;
+    private Quaternion realRotation;
     private static Socket connectSocket;
     private static RotationServer server;
     private static string IP;
-    private static Vector3 gyroData;
-    private static Vector3 accelData;
-    private static Vector3 magnetData;
     private static bool connected;
+    private static int ITEM_SIZE = 17;
 
-    private float lastVibrate = 0;
+    private static float initialYAngle = 0f;
+    private static float appliedGyroYAngle = 0f;
+    private static float calibrationYAngle = 0f;
 
     void Start()
     {
+        GameObject realPhone = GameObject.Find("PhoneData_RotationServer");
+
+        // Mode for the real game where no demo assets exist
+        if(realPhone == null)
+        {
+            GameObject phone = new GameObject("PhoneData_RotationServer");
+            phoneTransform = phone.transform;
+            GameObject ls = new GameObject("LightSaberData_RotationServer");
+            ls.transform.eulerAngles = new Vector3(0f, 0f, -90f);
+            ls.transform.parent = phoneTransform;
+            lightSaberTransform = ls.transform;
+        }
+        // Mode for the demo game where demo assets exist
+        else
+        {
+            phoneTransform = realPhone.GetComponent<Transform>();
+            lightSaberTransform = GameObject.Find("LightSaberData_RotationServer").transform;
+        }
+        accelerationData = Vector3.zero;
+        gyroAttitude = Quaternion.identity;
+        realRotation = Quaternion.identity;
+        initialYAngle = transform.eulerAngles.y;
+
         IP = Network.player.ipAddress;
-        cubeTransform = GameObject.Find("Phone").GetComponent<Transform>();
-        cubeRotation = Quaternion.identity;
         connected = false;
         StartListening();
         server = this;
-        lastVibrate = Time.time;
-        gyroData = Vector3.zero;
-        accelData = Vector3.zero;
-        magnetData = Vector3.zero;
-
     }
 
     void Update()
     {
-        cubeTransform.localRotation = cubeRotation;
 
-        // Test Vibration every 2sec, remove later
-        if(Time.time - lastVibrate > 2)
-        {
-            VibratePhone();
-            lastVibrate = Time.time;
-        }
+        phoneTransform.rotation = gyroAttitude;
+        phoneTransform.Rotate( 0f, 0f, 180f, Space.Self ); // Swap "handedness" of quaternion from gyro.
+        
+       #if UNITY_ANDROID
+            phoneTransform.Rotate( 90f, 245, 0f, Space.World ); // Rotate to make sense as a camera pointing out the back of your device.
+        #endif
 
+        #if UNITY_IOS
+            phoneTransform.Rotate( 90f, 180, 0f, Space.World ); // Rotate to make sense as a camera pointing out the back of your device.
+        #endif
+        
+        appliedGyroYAngle = transform.eulerAngles.y;
+        phoneTransform.Rotate( 0f, -calibrationYAngle, 0f, Space.World ); // Rotates y angle back however much it deviated when calibrationYAngle was saved.
+
+        realRotation = lightSaberTransform.rotation;
     }
 
     // Thread signal.
     public static ManualResetEvent allDone = new ManualResetEvent(false);
+
+
+    public void CalibrateYAngle()
+    {
+        calibrationYAngle = appliedGyroYAngle - initialYAngle; // Offsets the y angle in case it wasn't 0 at edit time.
+    }
 
     public void StartListening()
     {
@@ -113,7 +145,6 @@ public class RotationServer : MonoBehaviour
     public static void ReadCallback(IAsyncResult ar)
     {
         String content = String.Empty;
-
         // Retrieve the state object and the handler socket
         // from the asynchronous state object.
         StateObject state = (StateObject) ar.AsyncState;
@@ -167,51 +198,59 @@ public class RotationServer : MonoBehaviour
         StartListening();
     }
 
+    public Quaternion GetRotation()
+    {
+        return realRotation;
+    }
+
+    public float GetAcceleration()
+    {
+        return accelerationData.magnitude;
+    }
+
     private static void getDataFromString(string str)
     {
         string[] temp1 = str.Split('>');
         string[] temp2 = temp1[1].Split('<');
         string vectors = temp2[0];
-        string[] datas = vectors.Split(new Char[] {')', '('} );
-        float x, y, z;
-        if(datas.Length >= 5)
-        {
-            if(datas[1].Length > 0)
-            {
-                string[] gyroTemp = datas[1].Split(',');
-                x = float.Parse(gyroTemp[0]);
-                y = float.Parse(gyroTemp[1]);
-                z = float.Parse(gyroTemp[2]);
-                gyroData = new Vector3(x,y,z);
-                Debug.Log("Gyro: " + gyroData);
-            }
-    
-            if(datas[3].Length > 0)
-            {
-                string[] accelTemp = datas[3].Split(',');
-                x = float.Parse(accelTemp[0]);
-                y = float.Parse(accelTemp[1]);
-                z = float.Parse(accelTemp[2]);
-                accelData = new Vector3(x,y,z);
-                Debug.Log("Acceleration: " + accelData);
-            }
-    
-            if(datas[5].Length > 0)
-            {
-                string[] magnetTemp = datas[5].Split(',');
-                x = float.Parse(magnetTemp[0]);
-                y = float.Parse(magnetTemp[1]);
-                z = float.Parse(magnetTemp[2]);
-                magnetData = new Vector3(x,y,z);
-                Debug.Log("Magnetometer: " + magnetData);
-            }
+        string[] datas = vectors.Split(',');
+        
+        //double magnetTime = 0.0;
+        Quaternion gyroAttitudeData = Quaternion.identity;
+        Vector3 gyroRotationData = Vector3.zero;
+        Vector3 accelData = Vector3.zero;
+        Vector3 gravityData = Vector3.zero;
+        Vector3 magnetData = Vector3.zero;
 
+        if(datas.Length == ITEM_SIZE)
+        {
+            //magnetTime = double.Parse(datas[0]);
+
+            gyroAttitudeData.x = float.Parse(datas[1]);
+            gyroAttitudeData.y = float.Parse(datas[2]);
+            gyroAttitudeData.z = float.Parse(datas[3]);
+            gyroAttitudeData.w = float.Parse(datas[4]);
+
+            gyroRotationData.x = float.Parse(datas[5]);
+            gyroRotationData.y = float.Parse(datas[6]);
+            gyroRotationData.z = float.Parse(datas[7]);
+
+            accelData.x = float.Parse(datas[8]);
+            accelData.y = float.Parse(datas[9]);
+            accelData.z = float.Parse(datas[10]);
+
+            gravityData.x = float.Parse(datas[11]);
+            gravityData.y = float.Parse(datas[12]);
+            gravityData.z = float.Parse(datas[13]);
+
+            magnetData.x = float.Parse(datas[14]);
+            magnetData.y = float.Parse(datas[15]);
+            magnetData.z = float.Parse(datas[16]);
         }
 
-        // Do sensor fusion here
+        gyroAttitude = gyroAttitudeData;
+        accelerationData = accelData;
 
-        Quaternion rotation = Quaternion.identity;
-        cubeRotation = rotation;
     }
 
     private static void Send(Socket handler, String data)
@@ -231,7 +270,7 @@ public class RotationServer : MonoBehaviour
         }
     }
 
-    public void VibratePhone()
+    public static void VibratePhone()
     {
         if(connected)
         {
