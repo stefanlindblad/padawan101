@@ -25,6 +25,7 @@ public class RotationServer : MonoBehaviour
     private Transform phoneTransform;
     private Transform lightSaberTransform; 
     private static Quaternion gyroAttitude;
+    private static Vector3 accelerationData;
     private Quaternion realRotation;
     private static Socket connectSocket;
     private static RotationServer server;
@@ -38,15 +39,15 @@ public class RotationServer : MonoBehaviour
 
     void Start()
     {
-        GameObject realPhone = GameObject.Find("Phone");
+        GameObject realPhone = GameObject.Find("PhoneData_RotationServer");
 
         // Mode for the real game where no demo assets exist
         if(realPhone == null)
         {
-            GameObject phone = new GameObject("Phone");
+            GameObject phone = new GameObject("PhoneData_RotationServer");
             phoneTransform = phone.transform;
-            GameObject ls = new GameObject("LightSaber");
-            ls.transform.eulerAngles = new Vector3(90f, 180f, 0f);
+            GameObject ls = new GameObject("LightSaberData_RotationServer");
+            ls.transform.eulerAngles = new Vector3(0f, 0f, -90f);
             ls.transform.parent = phoneTransform;
             lightSaberTransform = ls.transform;
         }
@@ -54,9 +55,9 @@ public class RotationServer : MonoBehaviour
         else
         {
             phoneTransform = realPhone.GetComponent<Transform>();
-            lightSaberTransform = GameObject.Find("LightSaber").transform;
+            lightSaberTransform = GameObject.Find("LightSaberData_RotationServer").transform;
         }
-            
+        accelerationData = Vector3.zero;
         gyroAttitude = Quaternion.identity;
         realRotation = Quaternion.identity;
         initialYAngle = transform.eulerAngles.y;
@@ -69,9 +70,18 @@ public class RotationServer : MonoBehaviour
 
     void Update()
     {
+
         phoneTransform.rotation = gyroAttitude;
         phoneTransform.Rotate( 0f, 0f, 180f, Space.Self ); // Swap "handedness" of quaternion from gyro.
-        phoneTransform.Rotate( 90f, 180f, 0f, Space.World ); // Rotate to make sense as a camera pointing out the back of your device.
+        
+       #if UNITY_ANDROID
+            phoneTransform.Rotate( 90f, 245, 0f, Space.World ); // Rotate to make sense as a camera pointing out the back of your device.
+        #endif
+
+        #if UNITY_IOS
+            phoneTransform.Rotate( 90f, 180, 0f, Space.World ); // Rotate to make sense as a camera pointing out the back of your device.
+        #endif
+        
         appliedGyroYAngle = transform.eulerAngles.y;
         phoneTransform.Rotate( 0f, -calibrationYAngle, 0f, Space.World ); // Rotates y angle back however much it deviated when calibrationYAngle was saved.
 
@@ -193,6 +203,11 @@ public class RotationServer : MonoBehaviour
         return realRotation;
     }
 
+    public float GetAcceleration()
+    {
+        return accelerationData.magnitude;
+    }
+
     private static void getDataFromString(string str)
     {
         string[] temp1 = str.Split('>');
@@ -234,6 +249,8 @@ public class RotationServer : MonoBehaviour
         }
 
         gyroAttitude = gyroAttitudeData;
+        accelerationData = accelData;
+
     }
 
     private static void Send(Socket handler, String data)
@@ -253,7 +270,7 @@ public class RotationServer : MonoBehaviour
         }
     }
 
-    public void VibratePhone()
+    public static void VibratePhone()
     {
         if(connected)
         {

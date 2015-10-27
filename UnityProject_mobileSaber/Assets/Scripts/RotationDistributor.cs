@@ -16,7 +16,6 @@ public class RotationDistributor : MonoBehaviour {
     private GameObject button;
     private static bool connected = false;
     private Socket client;
-    private Transform cubeTransform; 
     private static bool vibrate = false;
 
     // ManualResetEvent instances signal completion.
@@ -28,7 +27,6 @@ public class RotationDistributor : MonoBehaviour {
     {
         connected = false;
         button = GameObject.Find("Button");
-        cubeTransform = GameObject.Find("Phone").GetComponent<Transform>();
         IP = GameObject.Find("InputField").GetComponent<InputField>();
         IP.text = PlayerPrefs.GetString("IP_Address");
         Input.gyro.enabled = true;
@@ -43,7 +41,7 @@ public class RotationDistributor : MonoBehaviour {
         }
         else
         {
-            button.GetComponentInChildren<Text>().text = "Connect";
+            button.GetComponentInChildren<Text>().text = "Connect to Game";
         }
 
         CheckVibrate();
@@ -54,10 +52,6 @@ public class RotationDistributor : MonoBehaviour {
         Vector3 accelData = Input.acceleration;
         Vector3 gravityData = Input.gyro.gravity.normalized;
         Vector3 magnetData = Input.compass.rawVector;
-
-
-
-        cubeTransform.localRotation = Input.gyro.attitude;
 
         if(connected)
         {

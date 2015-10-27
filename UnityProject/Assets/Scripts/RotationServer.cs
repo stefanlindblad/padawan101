@@ -30,12 +30,21 @@ public class RotationServer : MonoBehaviour
     private static Socket connectSocket;
     private static RotationServer server;
     private static string IP;
-    private static bool connected;
+    private static bool listening;
     private static int ITEM_SIZE = 17;
 
     private static float initialYAngle = 0f;
     private static float appliedGyroYAngle = 0f;
     private static float calibrationYAngle = 0f;
+
+    private MainEngine engine;
+    private MainEngine.Device device = MainEngine.Device.Android;
+
+
+    void Awake()
+    {
+        IP = Network.player.ipAddress;
+    }
 
     void Start()
     {
@@ -61,22 +70,45 @@ public class RotationServer : MonoBehaviour
         gyroAttitude = Quaternion.identity;
         realRotation = Quaternion.identity;
         initialYAngle = transform.eulerAngles.y;
-
-        IP = Network.player.ipAddress;
-        connected = false;
+        listening = false;
         StartListening();
         server = this;
     }
 
+
     void Update()
     {
+        if(engine == null)
+        {
+            GameObject engineObj = GameObject.Find("__MainEngine");
+            if(engineObj != null)
+            {
+                engine = engineObj.GetComponent<MainEngine>();
+            }
+        }
+        else
+        {
+            device = engine.UsedDevice();
+        }
+
         phoneTransform.rotation = gyroAttitude;
         phoneTransform.Rotate( 0f, 0f, 180f, Space.Self ); // Swap "handedness" of quaternion from gyro.
-        phoneTransform.Rotate( 90f, 180f, 0f, Space.World ); // Rotate to make sense as a camera pointing out the back of your device.
+        
+        if(device == MainEngine.Device.Android)
+            phoneTransform.Rotate( 90f, 245, 0f, Space.World ); // Rotate to make sense as a camera pointing out the back of your device.
+        
+        else if(device == MainEngine.Device.iPhone)
+            phoneTransform.Rotate( 90f, 180, 0f, Space.World ); // Rotate to make sense as a camera pointing out the back of your device.
+        
         appliedGyroYAngle = transform.eulerAngles.y;
         phoneTransform.Rotate( 0f, -calibrationYAngle, 0f, Space.World ); // Rotates y angle back however much it deviated when calibrationYAngle was saved.
 
         realRotation = lightSaberTransform.rotation;
+
+        if(!listening)
+        {
+            StartListening();
+        }
     }
 
     // Thread signal.
@@ -99,18 +131,19 @@ public class RotationServer : MonoBehaviour
 
         // Bind the socket to the local endpoint and listen for incoming connections.
         try
-        {
+        {   
             connectSocket.Bind(localEndPoint);
             connectSocket.Listen(2);
 
                 // Start an asynchronous socket to listen for connections.
                 Debug.Log("[SERVER] Waiting for a connection...");
                 connectSocket.BeginAccept(new AsyncCallback(AcceptCallback), connectSocket );
+                listening = true;
         }
         catch (Exception e)
         {
-            Debug.Log(e.ToString());
-            connected = false;
+            //Debug.Log(e.ToString());
+            listening = false;
         }
     }
 
@@ -129,7 +162,7 @@ public class RotationServer : MonoBehaviour
         connectSocket.BeginReceive( state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallback), state);
         Send(connectSocket, "Hello!");
         Debug.Log("[SERVER] Sent INIT sequence to client.");
-        connected = true;
+        listening = true;
 
     }
 
@@ -173,8 +206,8 @@ public class RotationServer : MonoBehaviour
         }
         catch(Exception e)
         {
-            connected = false;
-            Debug.Log(e.ToString());
+            listening = false;
+            //Debug.Log(e.ToString());
             server.closeConnection();
         }
     }
@@ -186,7 +219,6 @@ public class RotationServer : MonoBehaviour
             connectSocket.Close();
             connectSocket = null;
         }
-        StartListening();
     }
 
     public Quaternion GetRotation()
@@ -256,14 +288,14 @@ public class RotationServer : MonoBehaviour
         }
         catch (Exception e)
         {
-            connected = false;
-            Debug.Log(e.ToString());
+            listening = false;
+            //Debug.Log(e.ToString());
         }
     }
 
     public static void VibratePhone()
     {
-        if(connected)
+        if(listening)
         {
             Send(connectSocket, "vibration");
         }
@@ -280,8 +312,8 @@ public class RotationServer : MonoBehaviour
         }
         catch (Exception e) 
         {
-            connected = false;
-            Debug.Log(e.ToString());
+            listening = false;
+            //Debug.Log(e.ToString());
             server.closeConnection();
         }
     }

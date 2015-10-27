@@ -16,9 +16,16 @@ public class MainEngine : MonoBehaviour
 		Win,
 		NetworkSetup,
 		Spectating
-    }
-	;
+    };
+
+    public enum Device
+	{
+		iPhone,
+		Android
+    };
+
 	private State _gameState;
+	private Device _usedDevice;
 	private float _introTimePassed;
 	private float _networkSetupTimePassed;
 
@@ -55,8 +62,7 @@ public class MainEngine : MonoBehaviour
 	public GameObject winTextPrefab;
 
 	[Header("Cameras and rigs")]
-	public GameObject
-		introCam;
+	public GameObject introCam;
 	public GameObject mainCam;
 	public GameObject ovrCam;
 	public GameObject specCam;
@@ -83,6 +89,11 @@ public class MainEngine : MonoBehaviour
 		return _gameState;
 	}
 
+	public Device UsedDevice ()
+	{
+		return _usedDevice;
+	}
+
 	void Awake ()
 	{
         longIntro = GameObject.Find("LongIntro");
@@ -99,6 +110,7 @@ public class MainEngine : MonoBehaviour
 		timeText = GameObject.Find ("TimeText").GetComponent<Text> ();
         rotServer= GameObject.Find("RotationServer").GetComponent<RotationServer>();
         networkManager = GameObject.Find ("MyNetworkManager").GetComponent<MyNetworkManager> ();
+        _usedDevice = Device.Android;
 
 		_gameState = State.NetworkSetup;
 		OnStateEntering ();
@@ -213,7 +225,7 @@ public class MainEngine : MonoBehaviour
 			timeRemaining -= Time.deltaTime;
 		}
         player.setLightsaberRotation(rotServer.GetRotation());
-        Debug.Log("Acceleration:" + rotServer.GetAcceleration());
+        //Debug.Log("Acceleration:" + rotServer.GetAcceleration());
         player.playAccelerationSound(rotServer.GetAcceleration());
 
 		this.timeText.text = "Time left: " + String.Format ("{0:F2}", timeRemaining);
@@ -334,6 +346,14 @@ public class MainEngine : MonoBehaviour
 	// Stuff done every update step in a state
 	void OnStateRunning ()
 	{
+
+		if (Input.GetKeyDown (KeyCode.U))
+		{
+			_usedDevice = Device.iPhone;
+			Debug.Log("Switched to iPhone Rotation");
+		}
+		
+
 		switch (GameState ()) {
 		case State.Intro:
 
