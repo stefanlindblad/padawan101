@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\AI\Actions\ShootingAction.cs" />
+     <Compile Include="Assets\AdvancedParticleEffects\Plugins\AnBytes\Magic\APEBalls.cs" />
      <Compile Include="Assets\AndromedaSystem\Scripts\Billboard\Billboard.cs" />
      <Compile Include="Assets\Cardboard\Legacy\Scripts\CardboardOnGUI.cs" />
      <Compile Include="Assets\Cardboard\Legacy\Scripts\CardboardOnGUIMouse.cs" />
@@ -239,6 +240,8 @@
      <Compile Include="Assets\Scripts\VolumetricLineRenderer\CreateSinShapedLineStrip.cs" />
      <Compile Include="Assets\Scripts\VolumetricLineRenderer\ShotBehavior.cs" />
      <Compile Include="Assets\TextFadeInOut.cs" />
+     <Compile Include="Assets\demo head scene\CameraOrbit.cs" />
+     <None Include="Assets\PreIntegratedSkinShader\PreIntegratedSkinShaderSM3.shader" />
      <None Include="Assets\Cardboard\Legacy\Resources\SkyboxMesh.shader" />
      <None Include="Assets\Plugins\donotdelete.txt" />
      <None Include="Assets\LeapMotion\Materials\Sources\Shaders\Toony-Basic.shader" />
@@ -249,11 +252,13 @@
      <None Include="Assets\Fonts\3DText.shader" />
      <None Include="Assets\Plugins\VolumetricLines\Shaders\VolumetricLineShaderAlphaBlended.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\AspectRingShader.shader" />
+     <None Include="Assets\PreIntegratedSkinShader\PreIntegratedSkinShaderCommon.cginc" />
      <None Include="Assets\LeapMotion\DemoResources\ScrollerText.txt" />
      <None Include="Assets\LeapMotion\readme.txt" />
      <None Include="Assets\Plugins\VolumetricLines\Shaders\VolumetricLineShaderAdditive.shader" />
      <None Include="Assets\LeapMotion\Resources\ImageHandHighlight.shader" />
      <None Include="Assets\OVR\Shaders\TextShader3D.shader" />
+     <None Include="Assets\PreIntegratedSkinShader\PreIntegratedSkinShaderSM2_1DirSH.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\ScriptTemplates\BehaviorTreeTemplate.xml" />
      <None Include="Assets\LeapMotion\Shaders\RimShading.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\AspectSphereShader.shader" />
@@ -273,6 +278,7 @@
      <None Include="Assets\AndromedaSystem\Shaders\Hologram2DTextures.shader" />
      <None Include="Assets\Plugins\VolumetricLines\Shaders\VolumetricLineShaderAdditiveFast.shader" />
      <None Include="Assets\LeapMotion\Widgets\Shaders\SelfIllumAlpha.shader" />
+     <None Include="Assets\PreIntegratedSkinShader\PreIntegratedSkinShaderSM5.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\VisualSensorLineShader.shader" />
      <None Include="Assets\Plugins\Legacy\Android\AndroidManifest.xml" />
      <None Include="Assets\NewComputeShader.compute" />
@@ -290,6 +296,7 @@
      <None Include="Assets\Plugins\SystemWipeRecognizerDll.bundle\Contents\MacOS\version.txt" />
      <None Include="Assets\Cardboard\Resources\SolidColor.shader" />
      <None Include="Assets\Environment\Standard Assets\ParticleSystems\Shaders\PriorityParticleAdd.shader" />
+     <None Include="Assets\PreIntegratedSkinShader\PreIntegratedSkinShaderSM2.shader" />
      <None Include="Assets\Plugins\RAIN\Editor\Shaders\WaypointShader.shader" />
  <Reference Include="Assembly-Boo-firstpass">
  <HintPath>C:/Users/Prasanth/Documents/GitHub/padawan101/UnityProject/Library/ScriptAssemblies/Assembly-Boo-firstpass.dll</HintPath>
@@ -297,11 +304,17 @@
  <Reference Include="Assembly-UnityScript-firstpass">
  <HintPath>C:/Users/Prasanth/Documents/GitHub/padawan101/UnityProject/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
  </Reference>
+ <Reference Include="UnityEngine.Advertisements">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.Analytics">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="LeapCSharp.NET3.5">
  <HintPath>C:/Users/Prasanth/Documents/GitHub/padawan101/UnityProject/Assets/Plugins/LeapCSharp.NET3.5.dll</HintPath>
