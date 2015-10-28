@@ -10,18 +10,11 @@ public class PlayerManager : NetworkBehaviour
 	private GameObject lightSaber;
 	private GameObject enemyBall;
 
-	private MyNetworkManager networkManager;
-
 	[Header("Host prefabs")]
 	public GameObject
 		lightSaberPrefab;
 	public GameObject enemyBallPrefab;
     public GameObject shotPrefab;
-
-	void Start ()
-	{
-		networkManager = GameObject.Find ("MyNetworkManager").GetComponent<MyNetworkManager> ();
-	}
 
 	// Update is called once per frame
 	void Update ()

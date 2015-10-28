@@ -142,7 +142,7 @@ public class RotationServer : MonoBehaviour
         }
         catch (Exception e)
         {
-            //Debug.Log(e.ToString());
+            Debug.Log("[ROTATION_SERVER] Network Exception, trying to reconnect. " + e);
             listening = false;
         }
     }
@@ -205,6 +205,7 @@ public class RotationServer : MonoBehaviour
         }
         catch(Exception e)
         {
+            Debug.Log("[ROTATION_SERVER] Network Exception, trying to reconnect. " + e);
             server.closeConnection();
         }
     }
@@ -289,7 +290,8 @@ public class RotationServer : MonoBehaviour
         }
         catch (Exception e)
         {
-            server.closeConnection();
+            Debug.Log("[ROTATION_SERVER] Network Exception, trying to reconnect. " + e);
+            //server.closeConnection();
         }
     }
 
@@ -312,6 +314,7 @@ public class RotationServer : MonoBehaviour
         }
         catch (Exception e) 
         {
+            Debug.Log("[ROTATION_SERVER] Network Exception, trying to reconnect. " + e);
             server.closeConnection();
         }
     }

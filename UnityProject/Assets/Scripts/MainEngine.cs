@@ -47,7 +47,6 @@ public class MainEngine : MonoBehaviour
 	private Text scoreText;
 	private Text timeText;
 	private Text highScoreText;
-    private GameObject enemyBall;
     public GameObject[] enemies;
     // Fight state variables
     public float timeRemaining = 0f;
@@ -104,7 +103,6 @@ public class MainEngine : MonoBehaviour
         introText.SetActive(false);
 		winText = (GameObject)Instantiate (winTextPrefab, new Vector3 (0f, -1f, 33f), Quaternion.identity);
 		winText.SetActive (false);
-        this.enemyBall = GameObject.Find("enemyBall");
         scoreText = GameObject.Find ("ScoreText").GetComponent<Text> ();
 		highScoreText = GameObject.Find ("HighScore").GetComponent<Text> ();
 		timeText = GameObject.Find ("TimeText").GetComponent<Text> ();
@@ -193,10 +191,6 @@ public class MainEngine : MonoBehaviour
     }
 	void FightUpdate ()
 	{
-		if (Input.GetKeyDown(KeyCode.R)) { 
-			ChangeState (State.Fight);
-            //player.CmdKillAllBalls();
-        }
         if (Input.GetKeyDown (KeyCode.I))
 			ChangeState (State.Intro);
         if (Input.GetKeyDown(KeyCode.A)) {
@@ -280,7 +274,7 @@ public class MainEngine : MonoBehaviour
                 //	MovingText text = introText.GetComponent<MovingText> ();
                 //	text.Reset ();
                 //}
-                Debug.Log("EnterIntro");
+                //Debug.Log("EnterIntro");
                 
 			break;
 
@@ -317,7 +311,6 @@ public class MainEngine : MonoBehaviour
 
 		case State.Win:
                 player.CmdKillAllBalls();
-                //player.CmdToggleEnemyBall();
                 this.winText.SetActive (true);
 			break;
 
@@ -347,7 +340,11 @@ public class MainEngine : MonoBehaviour
 			_usedDevice = Device.iPhone;
 			Debug.Log("Switched to iPhone Rotation");
 		}
-		
+
+		if (Input.GetKeyDown (KeyCode.S))
+		{
+			ChangeState(State.Fight);
+		}
 
 		switch (GameState ()) {
 		case State.Intro:
