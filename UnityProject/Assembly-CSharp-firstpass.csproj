@@ -41,7 +41,11 @@
 	  <HintPath>D:/Program Files/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
+<<<<<<< HEAD
 	  <HintPath>D:/Program Files/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+=======
+	  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+>>>>>>> 2f98d673e4598159c6f7a55b72ab4ac83679a629
 	</Reference>
   </ItemGroup>
   <ItemGroup>
@@ -136,6 +140,10 @@
      <Compile Include="Assets\Standard Assets\Windows\Kinect\TrackingState.cs" />
      <Compile Include="Assets\Standard Assets\Windows\Kinect\Vector4.cs" />
      <None Include="Assets\PreIntegratedSkinShader\PreIntegratedSkinShaderSM3.shader" />
+<<<<<<< HEAD
+=======
+     <None Include="Assets\Cardboard\Legacy\Resources\SkyboxMesh.shader" />
+>>>>>>> 2f98d673e4598159c6f7a55b72ab4ac83679a629
      <None Include="Assets\Plugins\donotdelete.txt" />
      <None Include="Assets\Shaders\UnityVC\StandardVC.shader" />
      <None Include="Assets\Shaders\UnityVC\StandardSpecularVC.shader" />
@@ -166,6 +174,7 @@
      <None Include="Assets\Plugins\SystemWipeRecognizerDll.bundle\Contents\MacOS\version.txt" />
      <None Include="Assets\Environment\Standard Assets\ParticleSystems\Shaders\PriorityParticleAdd.shader" />
      <None Include="Assets\PreIntegratedSkinShader\PreIntegratedSkinShaderSM2.shader" />
+<<<<<<< HEAD
  <Reference Include="UnityEngine.UI">
  <HintPath>D:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
@@ -180,6 +189,28 @@
  </Reference>
  <Reference Include="UnityEditor.iOS.Extensions.Xcode">
  <HintPath>D:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
+=======
+ <Reference Include="UnityEngine.Advertisements">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.UI">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.Networking">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.Analytics">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
+ </Reference>
+ <Reference Include="LeapCSharp.NET3.5">
+ <HintPath>C:/Users/Prasanth/Documents/GitHub/padawan101/UnityProject/Assets/Plugins/LeapCSharp.NET3.5.dll</HintPath>
+ </Reference>
+ <Reference Include="Mono.Cecil">
+ <HintPath>C:/Program Files/Unity/Editor/Data/Managed/Mono.Cecil.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.iOS.Extensions.Xcode">
+ <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
+>>>>>>> 2f98d673e4598159c6f7a55b72ab4ac83679a629
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
