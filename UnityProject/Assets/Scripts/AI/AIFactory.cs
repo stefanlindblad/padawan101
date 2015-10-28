@@ -15,6 +15,7 @@ public class AIFactory : MonoBehaviour
 	public float shootAnimationTime = 3f;
 	public float minSpeed = 15f;
 	public float maxSpeed = 30f;
+	public float shootSpread = 5f;
 
 	private List<AINode> controlledObjects;
 
@@ -31,7 +32,7 @@ public class AIFactory : MonoBehaviour
 			if(node.IsWorking() == false)
 			{
 				float speed = Random.Range(minSpeed, maxSpeed);
-				node.SetDestination( NewPosition(node.GetPosition(), minDistance, maxDistance), speed, shootAnimationTime );
+				node.SetDestination( NewPosition(node.GetPosition(), minDistance, maxDistance), RandomSpread(), speed, shootAnimationTime );
 			}
 		}
 	}
@@ -46,7 +47,7 @@ public class AIFactory : MonoBehaviour
 		Vector3 newPos = Vector3.zero;
 		while(true)
 		{
-			newPos = RandomVector3();
+			newPos = RandomMovement();
 			if( ((newPos - oldPos).magnitude > minDist) && ((newPos - oldPos).magnitude < maxDist) )
 			{
 				return newPos;
@@ -54,7 +55,12 @@ public class AIFactory : MonoBehaviour
 		}
 	}
 
-	private Vector3 RandomVector3()
+	private Vector3 RandomSpread()
+		{
+		return new Vector3(Random.Range(-shootSpread, shootSpread), Random.Range(-shootSpread, shootSpread), Random.Range(-shootSpread, shootSpread));
+	}
+
+	private Vector3 RandomMovement()
 	{
 		return new Vector3(Random.Range(minX, maxX), Random.Range(minY, maxY), Random.Range(minZ, maxZ));
 	}

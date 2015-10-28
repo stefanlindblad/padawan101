@@ -11,8 +11,9 @@ public class AINode : MonoBehaviour
 	private float mySpeed;
 	private float travelDistance;
 	private bool hastoShoot;
-	private Vector3 destination;
+	private Vector3 mymoveDestination;
 	private Vector3 startPosition;
+	private Vector3 myshootDestination;
 
 	void Start()
 	{
@@ -39,9 +40,9 @@ public class AINode : MonoBehaviour
 		{
 			float movedTime = (Time.time - startTime) * mySpeed;
         	float movedPart = movedTime / travelDistance;
-        	transform.position = Vector3.Lerp(startPosition, destination, movedPart);
+        	transform.position = Vector3.Lerp(startPosition, mymoveDestination, movedPart);
         	
-        	if(transform.position == destination)
+        	if(transform.position == mymoveDestination)
         	{
         		isMoving = false;
         		isShooting = true;
@@ -52,7 +53,7 @@ public class AINode : MonoBehaviour
         if(isShooting)
         {
         	// Set here real player position
-        	ShootAtPlayer(Vector3.zero);
+        	ShootAtPlayer(myshootDestination);
         }
 	}
 
@@ -61,15 +62,16 @@ public class AINode : MonoBehaviour
 		return transform.position;
 	}
 
-	public void SetDestination(Vector3 dest, float speed, float shootTime)
+	public void SetDestination(Vector3 moveDest, Vector3 shootDest, float speed, float shootTime)
 	{
 		startPosition = transform.position;
+		myshootDestination = shootDest;
 		startTime = Time.time;
 		mySpeed = speed;
 		shootAnimationTime = shootTime;
-		destination = dest;
-		travelDistance = Vector3.Distance(transform.position, dest);
-		transform.LookAt(destination);
+		mymoveDestination = moveDest;
+		travelDistance = Vector3.Distance(transform.position, moveDest);
+		transform.LookAt(moveDest);
 		isMoving = true;
 	}
 
