@@ -91,6 +91,9 @@ public class RotationServer : MonoBehaviour
             device = engine.UsedDevice();
         }
 
+        if(gyroAttitude == Quaternion.identity)
+            return;
+
         phoneTransform.rotation = gyroAttitude;
         phoneTransform.Rotate( 0f, 0f, 180f, Space.Self ); // Swap "handedness" of quaternion from gyro.
         
@@ -272,7 +275,7 @@ public class RotationServer : MonoBehaviour
             magnetData.y = float.Parse(datas[15]);
             magnetData.z = float.Parse(datas[16]);
         }
-
+        Debug.Log("Gyo data bla : " + gyroAttitudeData.eulerAngles);
         gyroAttitude = gyroAttitudeData;
         accelerationData = accelData;
 

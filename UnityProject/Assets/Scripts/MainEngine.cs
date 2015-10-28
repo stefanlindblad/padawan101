@@ -3,6 +3,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 using System.Collections;
 using System;
+using UnityEngine.VR;
 
 public class MainEngine : MonoBehaviour
 {
@@ -222,9 +223,6 @@ public class MainEngine : MonoBehaviour
 
 	void WinUpdate ()
 	{
-		if (Input.GetKeyDown (KeyCode.R))
-			ChangeState (State.Fight);
-
 		if (Input.GetKeyDown (KeyCode.I))
 			ChangeState (State.Intro);
 	}
@@ -345,6 +343,12 @@ public class MainEngine : MonoBehaviour
 		{
 			ChangeState(State.Fight);
 		}
+
+		if (Input.GetKeyDown (KeyCode.R))
+		{
+			InputTracking.Recenter();
+		}
+
 
 		switch (GameState ()) {
 		case State.Intro:

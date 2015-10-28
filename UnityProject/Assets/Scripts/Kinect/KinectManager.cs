@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,6 +7,8 @@ using Kinect = Windows.Kinect;
 public class KinectManager : MonoBehaviour
 {
     public GameObject platform;
+    public GameObject lightSaber;
+    public bool useRightHand = true;
     public Vector3 OffsetVectorOfPlayer = new Vector3(0.0f, 1.0f, 1.5f); //Hardcoded :( Could be calibrated
 
     private BodySourceManager _BodyManager;
@@ -64,9 +66,29 @@ public class KinectManager : MonoBehaviour
 
     void Update()
     {
+
         //Get the data from the body
         Kinect.Body[] data = _BodyManager.GetData();
         if (data == null) { return; }
+
+
+        GameObject handJoint;
+        // Set the Lightsaber position for Right Hand
+        if(useRightHand)
+        {
+            handJoint = GameObject.Find("HandRight");
+        }
+        // Or for left Hand
+        else
+        {
+            handJoint = GameObject.Find("HandLeft");
+        }
+
+        if(lightSaber != null && handJoint)
+        {
+            lightSaber.transform.position = handJoint.transform.position;
+        }
+
 
         List<ulong> trackedIds = new List<ulong>();
         foreach (var body in data)
@@ -81,6 +103,8 @@ public class KinectManager : MonoBehaviour
                 trackedIds.Add(body.TrackingId);
             }
         }
+
+
 
 
         // --Check tracked bodies
@@ -273,12 +297,14 @@ public class KinectManager : MonoBehaviour
 
         for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
         {
-            GameObject jointObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            //GameObject jointObj = GameObject.CreatePrimitive(PrimitiveType.Cube));
+            //Changed it to a empty go that the mesh does not disturb. Can change it back.
+            GameObject jointObj = new GameObject();
 
-            LineRenderer lr = jointObj.AddComponent<LineRenderer>();
-            lr.SetVertexCount(2);
-            lr.material = BoneMaterial;
-            lr.SetWidth(0.005f, 0.005f);
+            //LineRenderer lr = jointObj.AddComponent<LineRenderer>();
+            //lr.SetVertexCount(2);
+            //lr.material = BoneMaterial;
+            //lr.SetWidth(0.005f, 0.005f);
 
             jointObj.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f);
             jointObj.name = jt.ToString();
@@ -304,17 +330,17 @@ public class KinectManager : MonoBehaviour
             Transform jointObj = bodyObject.transform.FindChild(jt.ToString());
             jointObj.localPosition = GetVector3FromJoint(sourceJoint);
 
-            LineRenderer lr = jointObj.GetComponent<LineRenderer>();
-            if (targetJoint.HasValue)
-            {
-                lr.SetPosition(0, jointObj.localPosition);
-                lr.SetPosition(1, GetVector3FromJoint(targetJoint.Value));
-                lr.SetColors(GetColorForState(sourceJoint.TrackingState), GetColorForState(targetJoint.Value.TrackingState));
-            }
-            else
-            {
-                lr.enabled = false;
-            }
+            //LineRenderer lr = jointObj.GetComponent<LineRenderer>();
+            //if (targetJoint.HasValue)
+            //{
+            //    lr.SetPosition(0, jointObj.localPosition);
+            //    lr.SetPosition(1, GetVector3FromJoint(targetJoint.Value));
+            //    lr.SetColors(GetColorForState(sourceJoint.TrackingState), GetColorForState(targetJoint.Value.TrackingState));
+            //}
+            //else
+            //{
+            //    lr.enabled = false;
+            //}
         }
     }
 
