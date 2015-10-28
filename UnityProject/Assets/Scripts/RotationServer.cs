@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Collections.Generic;
 using UnityEngine;
 
 // State object for receiving data from remote device.
@@ -33,7 +34,7 @@ public class RotationServer : MonoBehaviour
     private static string IP;
     private static bool listening;
     private static int ITEM_SIZE = 17;
-
+    private Queue<Quaternion> rotationValues;
     private static float initialYAngle = 0f;
     private static float appliedGyroYAngle = 0f;
     private static float calibrationYAngle = 0f;
@@ -45,6 +46,7 @@ public class RotationServer : MonoBehaviour
     void Awake()
     {
         IP = Network.player.ipAddress;
+        rotationValues = new Queue<Quaternion>();
     }
 
     void Start()
@@ -107,7 +109,7 @@ public class RotationServer : MonoBehaviour
         appliedGyroYAngle = transform.eulerAngles.y;
         phoneTransform.Rotate( 0f, -calibrationYAngle, 0f, Space.World ); // Rotates y angle back however much it deviated when calibrationYAngle was saved.
 
-        realRotation = lightSaberTransform.rotation;
+        realRotation = getSmoothRotation(lightSaberTransform.rotation);
 
         if(!listening)
         {
@@ -214,6 +216,26 @@ public class RotationServer : MonoBehaviour
         }
     }
 
+    private Quaternion getSmoothRotation(Quaternion rot)
+    {
+        rotationValues.Enqueue(rot);
+
+        if(rotationValues.Count < 4)
+        {
+            return rot;
+        }
+        else
+        {   
+            Quaternion[] values = new Quaternion[4];
+            values = rotationValues.ToArray();
+            rotationValues.Dequeue();
+            Quaternion smooth1 = Quaternion.Lerp(Quaternion.Lerp(values[0], values[1], 0.5f), Quaternion.Lerp(values[1], values[2], 0.5f), 0.5f);
+            Quaternion smooth2 = Quaternion.Lerp(Quaternion.Lerp(values[1], values[2], 0.5f), Quaternion.Lerp(values[2], values[3], 0.5f), 0.5f);
+            Quaternion smoothed = Quaternion.Lerp(smooth1, smooth2, 0.5f);
+            return smoothed;
+        }
+    }
+
     private void closeConnection()
     {
         Debug.Log("[ROTATION_SERVER] Closing Connection");
@@ -281,7 +303,6 @@ public class RotationServer : MonoBehaviour
             magnetData.y = float.Parse(datas[15]);
             magnetData.z = float.Parse(datas[16]);
         }
-        Debug.Log("Gyo data bla : " + gyroAttitudeData.eulerAngles);
         gyroAttitude = gyroAttitudeData;
         accelerationData = accelData;
 

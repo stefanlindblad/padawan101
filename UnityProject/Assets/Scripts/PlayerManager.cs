@@ -72,7 +72,6 @@ public class PlayerManager : NetworkBehaviour
     {
         if (this.lightSaber) {
             this.lightSaber.transform.rotation = rotation;
-			Debug.Log("Setting Rotation: " + rotation.eulerAngles);
         }
     }
     public void playAccelerationSound(float acceleration)

@@ -26,27 +26,29 @@ public class ShotBehavior : NetworkBehaviour
 	void Update ()
 	{
 		transform.position += transform.forward * Time.deltaTime * 100f;
-        var ls = GameObject.Find("NetworkedLightSaber(Clone)");
+        var ls = GameObject.FindWithTag("LightSaber");
         if (ls)
-            ls_collider = ls.GetComponent<Collider>();
+        {
+        	ls_collider = ls.GetComponent<Collider>();
+        }
     }
-
 
 	void OnTriggerEnter (Collider col)
 	{
-		if (ls_collider != null) {
-
-		}
-		if (col == ls_collider) {
-			mainEngine.AddScore ();
-            RotationServer.VibratePhone();
-			laserhit.Play ();
-			// Simple bounce
-
-			//Create the laser sword with every normal "forward" in local coordinates
-			Vector3 colNormal = col.transform.forward;
-			Vector3 laserDirection = this.transform.forward;
-			this.transform.forward = Vector3.Reflect (laserDirection, colNormal);
+		if (ls_collider != null)
+		{
+			if (col == ls_collider)
+			{
+				mainEngine.AddScore();
+        	    RotationServer.VibratePhone();
+				laserhit.Play();
+				// Simple bounce
+	
+				//Create the laser sword with every normal "forward" in local coordinates
+				Vector3 colNormal = col.transform.forward;
+				Vector3 laserDirection = this.transform.forward;
+				this.transform.forward = Vector3.Reflect (laserDirection, colNormal);
+			}
 		}
 	}
 
