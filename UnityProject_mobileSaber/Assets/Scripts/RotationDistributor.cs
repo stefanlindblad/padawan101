@@ -17,6 +17,7 @@ public class RotationDistributor : MonoBehaviour {
     private static bool connected = false;
     private Socket client;
     private static bool vibrate = false;
+    private static RotationDistributor distributor;
 
     // ManualResetEvent instances signal completion.
     private static ManualResetEvent connectDone = new ManualResetEvent(false);
@@ -31,13 +32,14 @@ public class RotationDistributor : MonoBehaviour {
         IP.text = PlayerPrefs.GetString("IP_Address");
         Input.gyro.enabled = true;
         Input.compass.enabled = true;
+        distributor = this;
     }
 
     void Update ()
     {
         if(connected)
         {
-            button.GetComponentInChildren<Text>().text = "Disconnect";
+            button.GetComponentInChildren<Text>().text = "Quit";
         }
         else
         {
@@ -68,19 +70,18 @@ public class RotationDistributor : MonoBehaviour {
                                      + magnetData.z.ToString("000.000") + "<EOF>");
                 sendDone.WaitOne();
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                connected = false;
-                Debug.Log(e.ToString());
+                distributor.closeConnection();
             }
         }   
     }
 
     void OnApplicationQuit()
     {
-        if(connected)
+        if(client != null)
         {
-            client.Close();
+            distributor.closeConnection();
         }
     }
 
@@ -106,18 +107,29 @@ public class RotationDistributor : MonoBehaviour {
                 Receive(client);
 
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                connected = false;
-                Debug.Log(e.ToString());
+                distributor.closeConnection();
             }
         }
         else
         {
-            client.Close();
-            connected = false;
+            Application.Quit();
         }
 
+    }
+
+    private void closeConnection()
+    {
+        Debug.Log("[ROTATION_CLIENT] Closing Connection");
+
+        if(client != null)
+        {
+            client.Close();
+            client = null;
+        }
+
+        connected = false;
     }
 
     private bool SocketConnected(Socket s)
@@ -143,8 +155,7 @@ public class RotationDistributor : MonoBehaviour {
         }
         catch (Exception e)
         {
-            connected = false;
-            Debug.Log(e.ToString());
+            distributor.closeConnection();
         }
     }
 
@@ -192,8 +203,7 @@ public class RotationDistributor : MonoBehaviour {
         }
         catch (Exception e)
         {
-            connected = false;
-            Debug.Log(e.ToString());
+            distributor.closeConnection();
         }
     }
 
@@ -227,8 +237,7 @@ public class RotationDistributor : MonoBehaviour {
         }
         catch (Exception e)
         {
-            connected = false;
-            Debug.Log(e.ToString());
+            distributor.closeConnection();
         }
     }
 
@@ -249,8 +258,7 @@ public class RotationDistributor : MonoBehaviour {
         }
         catch (Exception e)
         {
-            connected = false;
-            Debug.Log(e.ToString());
+            distributor.closeConnection();
         }
     }
 }
