@@ -3,8 +3,5 @@ Temp/
 .DS_Store
 *.html
 *.htm
-UnityProject/Assembly-CSharp-Editor-firstpass.csproj
-UnityProject/Assembly-CSharp-Editor.csproj
-UnityProject/Assembly-CSharp-firstpass.csproj
-UnityProject/Assembly-CSharp.csproj
+*.csproj
 UnityProject/UnityProject.sln
