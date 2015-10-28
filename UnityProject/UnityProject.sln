@@ -5,11 +5,8 @@ Project("{D001055D-889C-3BAE-66BD-CA6F720933D1}") = "UnityProject", "Assembly-CS
 EndProject
 Project("{D001055D-889C-3BAE-66BD-CA6F720933D1}") = "UnityProject", "Assembly-CSharp.csproj", "{5B580621-09B4-68CB-B5F4-5B9DD210A60F}"
 EndProject
-<<<<<<< HEAD
-=======
 Project("{D001055D-889C-3BAE-66BD-CA6F720933D1}") = "UnityProject", "Assembly-CSharp-Editor-firstpass.csproj", "{1A619002-4B9A-6116-9B31-D1EC3C3EFBA5}"
 EndProject
->>>>>>> 24c9958b9494d673ebb4a96243559ca4405e146a
 Project("{D001055D-889C-3BAE-66BD-CA6F720933D1}") = "UnityProject", "Assembly-CSharp-Editor.csproj", "{3CC9D2C0-C461-07D9-EDF3-4FFB4DE5C299}"
 EndProject
 Global
@@ -38,8 +35,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-<<<<<<< HEAD
-																												GlobalSection(MonoDevelopProperties) = preSolution
+																																GlobalSection(MonoDevelopProperties) = preSolution
 =======
 																																																																																																	GlobalSection(MonoDevelopProperties) = preSolution
 =======
