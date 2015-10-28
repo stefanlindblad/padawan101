@@ -8,20 +8,6 @@ using System.Collections;
 using System.Net;
 using System.Net.Sockets;
 
-// State object for receiving data from remote device.
-public class StateObject
-{
-    // Client socket.
-    public Socket workSocket = null;
-    // Size of receive buffer.
-    public const int BufferSize = 256;
-    // Receive buffer.
-    public byte[] buffer = new byte[BufferSize];
-    // Received data string.
-    public StringBuilder sb = new StringBuilder();
-
-}
-
 public class RotationDistributor : MonoBehaviour {
 
     //private float speed = 10.0F;
@@ -30,9 +16,8 @@ public class RotationDistributor : MonoBehaviour {
     private GameObject button;
     private static bool connected = false;
     private Socket client;
-    private Transform cubeTransform; 
     private static bool vibrate = false;
-
+    private static RotationDistributor distributor;
 
     // ManualResetEvent instances signal completion.
     private static ManualResetEvent connectDone = new ManualResetEvent(false);
@@ -43,56 +28,60 @@ public class RotationDistributor : MonoBehaviour {
     {
         connected = false;
         button = GameObject.Find("Button");
-        cubeTransform = GameObject.Find("Phone").GetComponent<Transform>();
         IP = GameObject.Find("InputField").GetComponent<InputField>();
         IP.text = PlayerPrefs.GetString("IP_Address");
         Input.gyro.enabled = true;
         Input.compass.enabled = true;
+        distributor = this;
     }
 
     void Update ()
     {
         if(connected)
         {
-            button.GetComponentInChildren<Text>().text = "Disconnect";
+            button.GetComponentInChildren<Text>().text = "Quit";
         }
         else
         {
-            button.GetComponentInChildren<Text>().text = "Connect";
+            button.GetComponentInChildren<Text>().text = "Connect to Game";
         }
 
         CheckVibrate();
 
-        Vector3 gyroData = Input.gyro.rotationRateUnbiased;
+        double magnetTime = Input.compass.timestamp;
+        Quaternion gyroAttitudeData = Input.gyro.attitude;
+        Vector3 gyroRotationData = Input.gyro.rotationRateUnbiased;
         Vector3 accelData = Input.acceleration;
+        Vector3 gravityData = Input.gyro.gravity.normalized;
         Vector3 magnetData = Input.compass.rawVector;
-
-        cubeTransform.localRotation = Input.gyro.attitude;
 
         if(connected)
         {
             try
             {
-                Send(client, "<BOF>" + "(" + gyroData.x.ToString("000.000") + "," + gyroData.y.ToString("000.000") + "," + gyroData.z.ToString("000.000") + ")"
-                                    + "(" + accelData.x.ToString("000.000") + "," + accelData.y.ToString("0.000") + "," + accelData.z.ToString("000.000") + ")"
-                                    + "(" + magnetData.x.ToString("000.000") + "," + magnetData.y.ToString("000.000") + "," + magnetData.z.ToString("000.000") + ")"
-                                    + "<EOF>");
+                Send(client, "<BOF>" + magnetTime.ToString("000000000.000000000") + "," + gyroAttitudeData.x.ToString("000.000") + ","
+                                     +  gyroAttitudeData.y.ToString("000.000") + "," + gyroAttitudeData.z.ToString("000.000") + ","
+                                     + gyroAttitudeData.w.ToString("000.000") + "," + gyroRotationData.x.ToString("000.000") + "," 
+                                     + gyroRotationData.y.ToString("000.000") + "," + gyroRotationData.z.ToString("000.000") + ","
+                                     + accelData.x.ToString("000.000") + "," + accelData.y.ToString("000.000") + "," 
+                                     + accelData.z.ToString("000.000") + "," + gravityData.x.ToString("000.000") + ","
+                                     + gravityData.y.ToString("000.000") + "," + gravityData.z.ToString("000.000") + ","
+                                     + magnetData.x.ToString("000.000") + "," + magnetData.y.ToString("000.000") + "," 
+                                     + magnetData.z.ToString("000.000") + "<EOF>");
                 sendDone.WaitOne();
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                connected = false;
-                Debug.Log(e.ToString());
+                distributor.closeConnection();
             }
-        }
-            
+        }   
     }
 
     void OnApplicationQuit()
     {
-        if(connected)
+        if(client != null)
         {
-            client.Close();
+            distributor.closeConnection();
         }
     }
 
@@ -118,18 +107,29 @@ public class RotationDistributor : MonoBehaviour {
                 Receive(client);
 
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
-                connected = false;
-                Debug.Log(e.ToString());
+                distributor.closeConnection();
             }
         }
         else
         {
-            client.Close();
-            connected = false;
+            Application.Quit();
         }
 
+    }
+
+    private void closeConnection()
+    {
+        Debug.Log("[ROTATION_CLIENT] Closing Connection");
+
+        if(client != null)
+        {
+            client.Close();
+            client = null;
+        }
+
+        connected = false;
     }
 
     private bool SocketConnected(Socket s)
@@ -155,8 +155,7 @@ public class RotationDistributor : MonoBehaviour {
         }
         catch (Exception e)
         {
-            connected = false;
-            Debug.Log(e.ToString());
+            distributor.closeConnection();
         }
     }
 
@@ -177,15 +176,13 @@ public class RotationDistributor : MonoBehaviour {
             
             // Read data from the remote device.
             int bytesRead = client.EndReceive(ar);
-
             if (bytesRead > 0)
             {
                 // There might be more data, so store the data received so far.
                 state.sb.Append(Encoding.ASCII.GetString(state.buffer,0,bytesRead));
                 // Get the rest of the data.
                 client.BeginReceive(state.buffer,0,StateObject.BufferSize,0,new AsyncCallback(ReceiveCallback), state);
-
-                 // All the data has arrived; put it in response.
+                // All the data has arrived; put it in response.
                 if (state.sb.Length > 1)
                 {
                     String response = state.sb.ToString();
@@ -200,15 +197,13 @@ public class RotationDistributor : MonoBehaviour {
                 }
             }
             else
-            {
-                client.BeginReceive(state.buffer,0,StateObject.BufferSize,0,new AsyncCallback(ReceiveCallback), state);
-                receiveDone.Set();
+            {   
+                connected = false;
             }
         }
         catch (Exception e)
         {
-            connected = false;
-            Debug.Log(e.ToString());
+            distributor.closeConnection();
         }
     }
 
@@ -242,8 +237,7 @@ public class RotationDistributor : MonoBehaviour {
         }
         catch (Exception e)
         {
-            connected = false;
-            Debug.Log(e.ToString());
+            distributor.closeConnection();
         }
     }
 
@@ -264,8 +258,7 @@ public class RotationDistributor : MonoBehaviour {
         }
         catch (Exception e)
         {
-            connected = false;
-            Debug.Log(e.ToString());
+            distributor.closeConnection();
         }
     }
 }

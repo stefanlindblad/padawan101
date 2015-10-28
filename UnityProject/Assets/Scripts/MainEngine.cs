@@ -16,28 +16,43 @@ public class MainEngine : MonoBehaviour
 		Win,
 		NetworkSetup,
 		Spectating
-    }
-	;
+    };
+
+    public enum Device
+	{
+		iPhone,
+		Android
+    };
 
 	private State _gameState;
+	private Device _usedDevice;
 	private float _introTimePassed;
 	private float _networkSetupTimePassed;
 
 	private GameObject ls;
-    
-	private MyNetworkManager networkManager;
+    private bool startFading = false;
+    private bool fadeOutStarted = false;
+    private bool introAlmostDone = false;
+    private bool introIsDone = false;
+    public float fadeTime = 0.5f;
 
-	private GameObject introText;
+    private MyNetworkManager networkManager;
+
+    private FadeObjectInOut fadingText;
+    private GameObject introBackground;
+    private GameObject longIntro;
+    private GameObject introText;
 	private GameObject winText;
+    private RotationServer rotServer;
 	private Text scoreText;
 	private Text timeText;
 	private Text highScoreText;
-
-
-	// Fight state variables
-	public float timeRemaining = 0f;
+    public GameObject[] enemies;
+    // Fight state variables
+    public float timeRemaining = 0f;
 	public int score = 0;
 	public int highScore = 0;
+    private int ballsSpawned = 0;
 
 	private bool hasSpawnedObjects = false;
 
@@ -46,8 +61,7 @@ public class MainEngine : MonoBehaviour
 	public GameObject winTextPrefab;
 
 	[Header("Cameras and rigs")]
-	public GameObject
-		introCam;
+	public GameObject introCam;
 	public GameObject mainCam;
 	public GameObject ovrCam;
 	public GameObject specCam;
@@ -65,8 +79,8 @@ public class MainEngine : MonoBehaviour
 		useOVR = false;
 
 	/* Constants */
-	private const float INTRO_LENGTH = 7.0f; // seconds
-	private const float NETWORK_SETUP_MAX_WAIT = 20.0f; // seconds
+	private const float INTRO_LENGTH = 40.0f; // seconds
+	private const float NETWORK_SETUP_MAX_WAIT = 2000.0f; // seconds
 	private const int HIT_SCORE = 10;
 
 	public State GameState ()
@@ -74,18 +88,27 @@ public class MainEngine : MonoBehaviour
 		return _gameState;
 	}
 
+	public Device UsedDevice ()
+	{
+		return _usedDevice;
+	}
+
 	void Awake ()
 	{
-
+        longIntro = GameObject.Find("LongIntro");
+        fadingText = longIntro.GetComponent<FadeObjectInOut>();
+        introBackground = GameObject.Find("IntroBackground");
+        introBackground.SetActive(false);
 		introText = GameObject.Find ("IntroText");
+        introText.SetActive(false);
 		winText = (GameObject)Instantiate (winTextPrefab, new Vector3 (0f, -1f, 33f), Quaternion.identity);
 		winText.SetActive (false);
-
-		scoreText = GameObject.Find ("ScoreText").GetComponent<Text> ();
+        scoreText = GameObject.Find ("ScoreText").GetComponent<Text> ();
 		highScoreText = GameObject.Find ("HighScore").GetComponent<Text> ();
 		timeText = GameObject.Find ("TimeText").GetComponent<Text> ();
-
-		networkManager = GameObject.Find ("MyNetworkManager").GetComponent<MyNetworkManager> ();
+        rotServer= GameObject.Find("RotationServer").GetComponent<RotationServer>();
+        networkManager = GameObject.Find ("MyNetworkManager").GetComponent<MyNetworkManager> ();
+        _usedDevice = Device.Android;
 
 		_gameState = State.NetworkSetup;
 		OnStateEntering ();
@@ -136,21 +159,63 @@ public class MainEngine : MonoBehaviour
 			ChangeState (State.Spectating);
 		}
 	}
-
+    void introUpdate()
+    {
+        this._introTimePassed += Time.fixedDeltaTime;
+        if (this._introTimePassed > MainEngine.INTRO_LENGTH)
+        {
+            ChangeState(State.Fight);
+        }
+        else
+        {
+            if (startFading == false)
+            {
+                fadingText.FadeIn();
+                startFading = true;
+            }
+            if (this._introTimePassed > 5.0f && fadeOutStarted == false)
+            {
+                introBackground.SetActive(false);
+                fadingText.FadeOut();
+                fadeOutStarted = true;
+            }
+            //else if (fadeOutStarted == true) { Debug.Log("Not anymore"); }
+            if (this._introTimePassed > 4.0f && introIsDone == false)
+            {
+                introText.SetActive(true);
+                MovingText text = introText.GetComponent<MovingText>();
+                text.Reset();
+                introIsDone = true;
+            }
+        }
+    }
 	void FightUpdate ()
 	{
-		if (Input.GetKeyDown (KeyCode.R))
-			ChangeState (State.Fight);
-
-		if (Input.GetKeyDown (KeyCode.I))
+        if (Input.GetKeyDown (KeyCode.I))
 			ChangeState (State.Intro);
-
-
+        if (Input.GetKeyDown(KeyCode.A)) {
+            spawnFirstBall();
+        }
+        if (Input.GetKeyDown(KeyCode.K)) {
+            player.CmdKillAllBalls();
+        }
+        if (timeRemaining < 40 && ballsSpawned == 1) {
+            player.CmdSpawnBalls();
+            ballsSpawned = 2;
+        }
+        if (timeRemaining < 20 && ballsSpawned == 2) {
+            player.CmdSpawnBalls();
+            ballsSpawned = 3;
+        }
 		if (timeRemaining <= 0) {
+            this.timeText.text = "Time left: 0.00";
 			ChangeState (State.Win);
 		} else {
 			timeRemaining -= Time.deltaTime;
 		}
+        player.setLightsaberRotation(rotServer.GetRotation());
+        //Debug.Log("Acceleration:" + rotServer.GetAcceleration());
+        player.playAccelerationSound(rotServer.GetAcceleration());
 
 		this.timeText.text = "Time left: " + String.Format ("{0:F2}", timeRemaining);
 	}
@@ -167,42 +232,71 @@ public class MainEngine : MonoBehaviour
 	public void AddScore ()
 	{
 		score += MainEngine.HIT_SCORE;
+        if (score > highScore) {
+            highScore = score;
+            this.highScoreText.text = "Highscore: " + highScore;
+        }
+        
 		this.scoreText.text = "Score: " + score;
 	}
-
+    void spawnFirstBall()
+    {
+        player.CmdSpawnBalls();
+    }
 
 	// Stuff done once if you enter a state
 	void OnStateEntering ()
 	{
 		switch (GameState ()) {
 		case State.Intro:
-			this._introTimePassed = 0.0f;
-			if (useOVR) {
-				this.ovrCam.transform.position = introOVRCamPosition;
-			} else {
-				SwitchCamera (this.introCam);
-			}
-                
-			if (introText) {
-				introText.SetActive (true);
-				MovingText text = introText.GetComponent<MovingText> ();
-				text.Reset ();
-			}
+                player.CmdKillAllBalls();
+                introBackground.SetActive(true);
+                this._introTimePassed = 0.0f;
+                if (useOVR)
+                {
+                    this.ovrCam.transform.position = introOVRCamPosition;
+                }
+                else
+                {
+                    SwitchCamera(this.introCam);
+                }
+                if (startFading == true)
+                    startFading = false;
+                if (fadeOutStarted == true)
+                    fadeOutStarted = false;
+                if (introAlmostDone == true)
+                    introAlmostDone = false;
+                if (introIsDone == true)
+                    introIsDone = false;
 
+                //if (introText) {
+                //	introText.SetActive (true);
+                //	MovingText text = introText.GetComponent<MovingText> ();
+                //	text.Reset ();
+                //}
+                //Debug.Log("EnterIntro");
+                
 			break;
 
 		case State.Fight:
-			var playerObj = GameObject.FindWithTag ("Player");
+                
+                var playerObj = GameObject.FindWithTag ("Player");
 			this.player = playerObj.GetComponent<PlayerManager> ();
 			if (!hasSpawnedObjects) {
 				player.CmdSpawnObjects ();
 				hasSpawnedObjects = true;
-			}
-			if (useOVR) {
+            } /*else {
+                player.CmdSpawnBalls();
+            }*/
+                player.CmdKillAllBalls();
+                ballsSpawned = 0;
+                player.CmdSpawnBalls();
+                ballsSpawned = 1;
+                if (useOVR) {
 				this.ovrCam.transform.position = fightOVRCamPosition;
 			}
 			this.score = 0;
-			this.timeRemaining = 10.0f;
+			this.timeRemaining = 60.0f;
 
 			this.scoreText.text = "Score: 0";            
 			this.timeText.text = "Time left: 10";
@@ -216,7 +310,8 @@ public class MainEngine : MonoBehaviour
 			break;
 
 		case State.Win:
-			this.winText.SetActive (true);
+                player.CmdKillAllBalls();
+                this.winText.SetActive (true);
 			break;
 
 		case State.Loose:
@@ -239,14 +334,26 @@ public class MainEngine : MonoBehaviour
 	// Stuff done every update step in a state
 	void OnStateRunning ()
 	{
+
+		if (Input.GetKeyDown (KeyCode.U))
+		{
+			_usedDevice = Device.iPhone;
+			Debug.Log("Switched to iPhone Rotation");
+		}
+
+		if (Input.GetKeyDown (KeyCode.S))
+		{
+			ChangeState(State.Fight);
+		}
+
 		switch (GameState ()) {
 		case State.Intro:
 
-			this._introTimePassed += Time.fixedDeltaTime;
-			if (this._introTimePassed > MainEngine.INTRO_LENGTH)
-				ChangeState (State.Fight);
-
-			break;
+                //this._introTimePassed += Time.fixedDeltaTime;
+                //if (this._introTimePassed > MainEngine.INTRO_LENGTH)
+                //	ChangeState (State.Fight);
+                introUpdate();
+                break;
 
 		case State.Fight:
 			FightUpdate ();

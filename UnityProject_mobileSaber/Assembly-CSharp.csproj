@@ -45,7 +45,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\ApplicationQuit.cs" />
+     <Compile Include="Assets\Scripts\ApplicationQuit.cs" />
      <Compile Include="Assets\Scripts\RotationDistributor.cs" />
      <Compile Include="Assets\Scripts\RotationServer.cs" />
  <Reference Include="UnityEngine.UI">
