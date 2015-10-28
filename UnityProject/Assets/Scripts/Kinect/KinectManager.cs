@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Kinect = Windows.Kinect;
 
-public class KinectManager : MonoBehaviour 
+public class KinectManager : MonoBehaviour
 {
     public GameObject platform;
     public Vector3 OffsetVectorOfPlayer = new Vector3(0.0f, 1.0f, 1.5f); //Hardcoded :( Could be calibrated
@@ -16,34 +16,34 @@ public class KinectManager : MonoBehaviour
     public Material BoneMaterial;
     private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
 
-    private  KalmanFilter positionKalman;
-    
+    private KalmanFilter positionKalman;
+
     private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMap = new Dictionary<Kinect.JointType, Kinect.JointType>()
     {
         { Kinect.JointType.FootLeft, Kinect.JointType.AnkleLeft },
         { Kinect.JointType.AnkleLeft, Kinect.JointType.KneeLeft },
         { Kinect.JointType.KneeLeft, Kinect.JointType.HipLeft },
         { Kinect.JointType.HipLeft, Kinect.JointType.SpineBase },
-        
+
         { Kinect.JointType.FootRight, Kinect.JointType.AnkleRight },
         { Kinect.JointType.AnkleRight, Kinect.JointType.KneeRight },
         { Kinect.JointType.KneeRight, Kinect.JointType.HipRight },
         { Kinect.JointType.HipRight, Kinect.JointType.SpineBase },
-        
+
         { Kinect.JointType.HandTipLeft, Kinect.JointType.HandLeft },
         { Kinect.JointType.ThumbLeft, Kinect.JointType.HandLeft },
         { Kinect.JointType.HandLeft, Kinect.JointType.WristLeft },
         { Kinect.JointType.WristLeft, Kinect.JointType.ElbowLeft },
         { Kinect.JointType.ElbowLeft, Kinect.JointType.ShoulderLeft },
         { Kinect.JointType.ShoulderLeft, Kinect.JointType.SpineShoulder },
-        
+
         { Kinect.JointType.HandTipRight, Kinect.JointType.HandRight },
         { Kinect.JointType.ThumbRight, Kinect.JointType.HandRight },
         { Kinect.JointType.HandRight, Kinect.JointType.WristRight },
         { Kinect.JointType.WristRight, Kinect.JointType.ElbowRight },
         { Kinect.JointType.ElbowRight, Kinect.JointType.ShoulderRight },
         { Kinect.JointType.ShoulderRight, Kinect.JointType.SpineShoulder },
-        
+
         { Kinect.JointType.SpineBase, Kinect.JointType.SpineMid },
         { Kinect.JointType.SpineMid, Kinect.JointType.SpineShoulder },
         { Kinect.JointType.SpineShoulder, Kinect.JointType.Neck },
@@ -110,14 +110,14 @@ public class KinectManager : MonoBehaviour
                 if (!_Bodies.ContainsKey(body.TrackingId))
                 {
                     _Bodies[body.TrackingId] = CreateBodyObject(body.TrackingId);
-                    
+
                     // Store bodies
                     StoredBodies[body.TrackingId] = body;
                 }
 
                 RefreshBodyObject(body, _Bodies[body.TrackingId]);
 
-                
+
             }
         }
 
@@ -163,7 +163,7 @@ public class KinectManager : MonoBehaviour
      */
 
     // Return every position in the body in a list of vec3
-    public Result getBodyPos(bool interpolate=false)
+    public Result getBodyPos(bool interpolate = false)
     {
         Result result = new Result();
 
@@ -183,11 +183,11 @@ public class KinectManager : MonoBehaviour
                     positionKalman.initialize(3, 3);
 
                     Double[] posRes = { 0, 0, 0 };
-                    Double[] measuredPos = {0,0,0};
+                    Double[] measuredPos = {0, 0, 0};
                     measuredPos[0] = cePos.x;
                     measuredPos[1] = cePos.y;
                     measuredPos[2] = cePos.z;
-                    
+
 
                     positionKalman.setR(Time.deltaTime * 100); // HACK doesn't take into account Kinect's own update deltaT
                     positionKalman.predict();
@@ -201,28 +201,28 @@ public class KinectManager : MonoBehaviour
                 }
 
                 //
-                
+
                 pos.Add(cePos);
             }
 
-            
+
 
             // Return
             result.Success = true;
             result.AccessToken = pos;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             result.ErrorMessage = ex.Message;
             result.Success = false;
         }
 
         return result;
-        
+
     }
 
     // Return the position of jointTypeName
-    public Result getBodyPartPos(Kinect.JointType jointTypeName, bool interpolate=false)
+    public Result getBodyPartPos(Kinect.JointType jointTypeName, bool interpolate = false)
     {
         Result result = new Result();
 
@@ -234,7 +234,7 @@ public class KinectManager : MonoBehaviour
             result.Success = true;
             result.AccessToken = pos;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             result.ErrorMessage = ex.Message;
             result.Success = false;
@@ -245,8 +245,8 @@ public class KinectManager : MonoBehaviour
 
     public void updateCurrentPlayer(List<ulong> trackedIds)
     {
-        if (StoredBodies.Count == 1){
-            
+        if (StoredBodies.Count == 1) {
+
             CurrentPlayer = StoredBodies[trackedIds[0]];
         }
         else if (StoredBodies.Count > 1)
@@ -257,7 +257,7 @@ public class KinectManager : MonoBehaviour
         {
             //Debug.Log("Stored Bodies not initilized");
         }
-            
+
     }
 
 
@@ -331,7 +331,7 @@ public class KinectManager : MonoBehaviour
 
         if (centerToPlatform)
         {
-            
+
             kinectPos += platform.transform.position + OffsetVectorOfPlayer;
         }
         return kinectPos;
@@ -343,14 +343,14 @@ public class KinectManager : MonoBehaviour
     {
         switch (state)
         {
-            case Kinect.TrackingState.Tracked:
-                return Color.green;
+        case Kinect.TrackingState.Tracked:
+            return Color.green;
 
-            case Kinect.TrackingState.Inferred:
-                return Color.red;
+        case Kinect.TrackingState.Inferred:
+            return Color.red;
 
-            default:
-                return Color.black;
+        default:
+            return Color.black;
         }
     }
 }
