@@ -349,6 +349,16 @@ public class MainEngine : MonoBehaviour
 			InputTracking.Recenter();
 		}
 
+		if (Input.GetKey (KeyCode.N))
+		{
+			rotServer.ChangeCalibration(-1);
+		}
+
+		if (Input.GetKey (KeyCode.M))
+		{
+			rotServer.ChangeCalibration(1);
+		}
+
 
 		switch (GameState ()) {
 		case State.Intro:

@@ -21,7 +21,8 @@ public class StateObject
 
 public class RotationServer : MonoBehaviour
 {
-    private int port = 25005;
+    public int port = 25005;
+    public float calibrationValue = 0;
     private Transform phoneTransform;
     private Transform lightSaberTransform; 
     private static Quaternion gyroAttitude;
@@ -98,10 +99,10 @@ public class RotationServer : MonoBehaviour
         phoneTransform.Rotate( 0f, 0f, 180f, Space.Self ); // Swap "handedness" of quaternion from gyro.
         
         if(device == MainEngine.Device.Android)
-            phoneTransform.Rotate( 90f, 245, 0f, Space.World ); // Rotate to make sense as a camera pointing out the back of your device.
+            phoneTransform.Rotate( 90f, 245f + calibrationValue, 0f, Space.World ); // Rotate to make sense as a camera pointing out the back of your device.
         
         else if(device == MainEngine.Device.iPhone)
-            phoneTransform.Rotate( 90f, 180, 0f, Space.World ); // Rotate to make sense as a camera pointing out the back of your device.
+            phoneTransform.Rotate( 90f, 180f + calibrationValue, 0f, Space.World ); // Rotate to make sense as a camera pointing out the back of your device.
         
         appliedGyroYAngle = transform.eulerAngles.y;
         phoneTransform.Rotate( 0f, -calibrationYAngle, 0f, Space.World ); // Rotates y angle back however much it deviated when calibrationYAngle was saved.
@@ -234,6 +235,11 @@ public class RotationServer : MonoBehaviour
     public float GetAcceleration()
     {
         return accelerationData.magnitude;
+    }
+
+    public void ChangeCalibration(float value)
+    {
+        calibrationValue += value;
     }
 
     private static void getDataFromString(string str)
