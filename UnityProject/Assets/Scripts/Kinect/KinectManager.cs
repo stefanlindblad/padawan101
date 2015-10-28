@@ -6,12 +6,17 @@ using Kinect = Windows.Kinect;
 
 public class KinectManager : MonoBehaviour 
 {
+    public GameObject platform;
+    public Vector3 OffsetVectorOfPlayer = new Vector3(0.0f, 1.0f, 1.5f); //Hardcoded :( Could be calibrated
+
     private BodySourceManager _BodyManager;
     private Kinect.Body CurrentPlayer;
     public Dictionary<ulong, Kinect.Body> StoredBodies = new Dictionary<ulong, Kinect.Body>();
 
     public Material BoneMaterial;
     private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
+
+    private  KalmanFilter positionKalman;
     
     private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMap = new Dictionary<Kinect.JointType, Kinect.JointType>()
     {
@@ -158,7 +163,7 @@ public class KinectManager : MonoBehaviour
      */
 
     // Return every position in the body in a list of vec3
-    public Result getBodyPos()
+    public Result getBodyPos(bool interpolate=false)
     {
         Result result = new Result();
 
@@ -168,9 +173,41 @@ public class KinectManager : MonoBehaviour
             for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
             {
                 Kinect.Joint joint = CurrentPlayer.Joints[jt];
-                pos.Add(GetVector3FromJoint(joint));
+                Vector3 cePos = GetVector3FromJoint(joint);
+
+                // Smoothing
+                bool smoothing = true;
+                if (smoothing)
+                {
+                    positionKalman = new KalmanFilter();
+                    positionKalman.initialize(3, 3);
+
+                    Double[] posRes = { 0, 0, 0 };
+                    Double[] measuredPos = {0,0,0};
+                    measuredPos[0] = cePos.x;
+                    measuredPos[1] = cePos.y;
+                    measuredPos[2] = cePos.z;
+                    
+
+                    positionKalman.setR(Time.deltaTime * 100); // HACK doesn't take into account Kinect's own update deltaT
+                    positionKalman.predict();
+                    positionKalman.update(measuredPos);
+                    posRes = positionKalman.getState();
+
+                    cePos.x = (float)posRes[0];
+                    cePos.y = (float)posRes[1];
+                    cePos.z = (float)posRes[2];
+
+                }
+
+                //
+                
+                pos.Add(cePos);
             }
 
+            
+
+            // Return
             result.Success = true;
             result.AccessToken = pos;
         }
@@ -185,7 +222,7 @@ public class KinectManager : MonoBehaviour
     }
 
     // Return the position of jointTypeName
-    public Result getBodyPartPos(Kinect.JointType jointTypeName)
+    public Result getBodyPartPos(Kinect.JointType jointTypeName, bool interpolate=false)
     {
         Result result = new Result();
 
@@ -241,9 +278,9 @@ public class KinectManager : MonoBehaviour
             LineRenderer lr = jointObj.AddComponent<LineRenderer>();
             lr.SetVertexCount(2);
             lr.material = BoneMaterial;
-            lr.SetWidth(0.05f, 0.05f);
+            lr.SetWidth(0.005f, 0.005f);
 
-            jointObj.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+            jointObj.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f);
             jointObj.name = jt.ToString();
             jointObj.transform.parent = body.transform;
         }
@@ -286,10 +323,18 @@ public class KinectManager : MonoBehaviour
     // -----------------------------------------------------------------
 
     // Get 3D pos of Kinect.Joint
-    private static Vector3 GetVector3FromJoint(Kinect.Joint joint)
+    private Vector3 GetVector3FromJoint(Kinect.Joint joint, bool centerToPlatform = true, int faceTo = -1)
     {
-        float scale = 10.0f;
-        return new Vector3(joint.Position.X * scale, joint.Position.Y * scale, joint.Position.Z * scale);
+        // faceTo = -1 gives the POV of the player (1st person) and =1 gives the mirror
+        float scale = 1.0f;
+        Vector3 kinectPos = new Vector3(joint.Position.X * scale, joint.Position.Y * scale, faceTo * joint.Position.Z * scale);
+
+        if (centerToPlatform)
+        {
+            
+            kinectPos += platform.transform.position + OffsetVectorOfPlayer;
+        }
+        return kinectPos;
     }
 
 
