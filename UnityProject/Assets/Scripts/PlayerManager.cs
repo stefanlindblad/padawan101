@@ -74,6 +74,13 @@ public class PlayerManager : NetworkBehaviour
             this.lightSaber.transform.rotation = rotation;
         }
     }
+    public void setLightSaberPosition(Vector3 position)
+    {
+        if (this.lightSaber) {
+            this.lightSaber.transform.position = position;
+            this.lightSaber.transform.Translate(new Vector3(0.0f, -0.12f, -0.05f), Space.Self);
+        }
+    }
     public void playAccelerationSound(float acceleration)
     {
         if (acceleration > 1.5f)

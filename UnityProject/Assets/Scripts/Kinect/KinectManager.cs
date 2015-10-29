@@ -10,6 +10,7 @@ public class KinectManager : MonoBehaviour
     public GameObject lightSaber;
     public bool useRightHand = true;
     public Vector3 OffsetVectorOfPlayer = new Vector3(0.0f, 1.0f, 1.5f); //Hardcoded :( Could be calibrated
+    public float KinectBodyScale = 1.0f;
 
     private BodySourceManager _BodyManager;
     private Kinect.Body CurrentPlayer;
@@ -18,7 +19,7 @@ public class KinectManager : MonoBehaviour
     public Material BoneMaterial;
     private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
 
-    private KalmanFilter positionKalman;
+    private Dictionary<Kinect.JointType, Vector3[]> smoothedJoints;
 
     private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMap = new Dictionary<Kinect.JointType, Kinect.JointType>()
     {
@@ -52,6 +53,34 @@ public class KinectManager : MonoBehaviour
         { Kinect.JointType.Neck, Kinect.JointType.Head },
     };
 
+    private Dictionary<int, Kinect.JointType> jointMap = new Dictionary<int, Kinect.JointType>() {    
+        {0,Kinect.JointType.SpineBase},
+        {1,Kinect.JointType.SpineMid},
+        {2,Kinect.JointType.Neck},
+        {3,Kinect.JointType.Head},
+        {4,Kinect.JointType.ShoulderLeft},
+        {5,Kinect.JointType.ElbowLeft},
+        {6,Kinect.JointType.WristLeft},
+        {7,Kinect.JointType.HandLeft},
+        {8,Kinect.JointType.ShoulderRight},
+        {9,Kinect.JointType.ElbowRight},
+        {10,Kinect.JointType.WristRight},
+        {11,Kinect.JointType.HandRight},
+        {12,Kinect.JointType.HipLeft},
+        {13,Kinect.JointType.KneeLeft},
+        {14,Kinect.JointType.AnkleLeft},
+        {15,Kinect.JointType.FootLeft},
+        {16,Kinect.JointType.HipRight},
+        {17,Kinect.JointType.KneeRight},
+        {18,Kinect.JointType.AnkleRight},
+        {19,Kinect.JointType.FootRight},
+        {20,Kinect.JointType.SpineShoulder},
+        {21,Kinect.JointType.HandTipLeft},
+        {22,Kinect.JointType.ThumbLeft},
+        {23,Kinect.JointType.HandTipRight},
+        {24,Kinect.JointType.ThumbRight},
+    };
+
 
 
 
@@ -62,6 +91,14 @@ public class KinectManager : MonoBehaviour
         // Get body from Kinect
         _BodyManager = this.GetComponent<BodySourceManager>();
         if (_BodyManager == null) { return; }
+        /*positionKalman = new KalmanFilter();
+        positionKalman.initialize(3, 3);
+        positionKalman.setR(1.0f);*/
+        smoothedJoints = new Dictionary<Kinect.JointType, Vector3[]>();
+        for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
+        {
+            smoothedJoints[jt] = new Vector3[4];
+        }
     }
 
     void Update()
@@ -72,22 +109,6 @@ public class KinectManager : MonoBehaviour
         if (data == null) { return; }
 
 
-        GameObject handJoint;
-        // Set the Lightsaber position for Right Hand
-        if(useRightHand)
-        {
-            handJoint = GameObject.Find("HandRight");
-        }
-        // Or for left Hand
-        else
-        {
-            handJoint = GameObject.Find("HandLeft");
-        }
-
-        if(lightSaber != null && handJoint)
-        {
-            lightSaber.transform.position = handJoint.transform.position;
-        }
 
 
         List<ulong> trackedIds = new List<ulong>();
@@ -140,19 +161,39 @@ public class KinectManager : MonoBehaviour
                 }
 
                 RefreshBodyObject(body, _Bodies[body.TrackingId]);
-
-
             }
         }
 
-
         //Update the current player
         updateCurrentPlayer(trackedIds);
+
+        updateSmoothedJoints();
     }
 
+    private void updateSmoothedJoints()
+    {
+        if (CurrentPlayer == null) return;
+        
+        for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
+        {
+            Vector3 newJointPosition = GetVector3FromJoint(CurrentPlayer.Joints[jt]);
 
+            for (int i = 3; i > 0; i--) {
+                 smoothedJoints[jt][i] = smoothedJoints[jt][i-1];
+            }
+            smoothedJoints[jt][0] = newJointPosition;
+            smoothedJoints[jt][0] = interp(smoothedJoints[jt]);
+            //Debug.Log("jt:" + jt +" len:" + smoothedJoints[jt].Length);
+        }
+        
+    }
 
-
+    private Vector3 interp(Vector3[] values) 
+    {
+        Vector3 smooth1 = Vector3.Lerp(Vector3.Lerp(values[0], values[1], 0.5f), Vector3.Lerp(values[1], values[2], 0.5f), 0.5f);
+        Vector3 smooth2 = Vector3.Lerp(Vector3.Lerp(values[1], values[2], 0.5f), Vector3.Lerp(values[2], values[3], 0.5f), 0.5f);
+        return Vector3.Lerp(smooth1, smooth2, 0.5f);
+    }
 
     // -----------------------------------------------------------------
     // ------------------  POSITIONAL TRACKING -------------------------
@@ -191,58 +232,16 @@ public class KinectManager : MonoBehaviour
     {
         Result result = new Result();
 
-        try
+        List<Vector3> pos = new List<Vector3>();       
+        for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
         {
-            List<Vector3> pos = new List<Vector3>();
-            for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
-            {
-                Kinect.Joint joint = CurrentPlayer.Joints[jt];
-                Vector3 cePos = GetVector3FromJoint(joint);
-
-                // Smoothing
-                bool smoothing = true;
-                if (smoothing)
-                {
-                    positionKalman = new KalmanFilter();
-                    positionKalman.initialize(3, 3);
-
-                    Double[] posRes = { 0, 0, 0 };
-                    Double[] measuredPos = {0, 0, 0};
-                    measuredPos[0] = cePos.x;
-                    measuredPos[1] = cePos.y;
-                    measuredPos[2] = cePos.z;
-
-
-                    positionKalman.setR(Time.deltaTime * 100); // HACK doesn't take into account Kinect's own update deltaT
-                    positionKalman.predict();
-                    positionKalman.update(measuredPos);
-                    posRes = positionKalman.getState();
-
-                    cePos.x = (float)posRes[0];
-                    cePos.y = (float)posRes[1];
-                    cePos.z = (float)posRes[2];
-
-                }
-
-                //
-
-                pos.Add(cePos);
-            }
-
-
-
-            // Return
-            result.Success = true;
-            result.AccessToken = pos;
+            pos.Add(smoothedJoints[jt][0]);
         }
-        catch (Exception ex)
-        {
-            result.ErrorMessage = ex.Message;
-            result.Success = false;
-        }
+
+        result.Success = true;
+        result.AccessToken = pos;
 
         return result;
-
     }
 
     // Return the position of jointTypeName
@@ -297,9 +296,9 @@ public class KinectManager : MonoBehaviour
 
         for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
         {
-            //GameObject jointObj = GameObject.CreatePrimitive(PrimitiveType.Cube));
+            GameObject jointObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
             //Changed it to a empty go that the mesh does not disturb. Can change it back.
-            GameObject jointObj = new GameObject();
+            //GameObject jointObj = new GameObject();
 
             //LineRenderer lr = jointObj.AddComponent<LineRenderer>();
             //lr.SetVertexCount(2);
@@ -352,12 +351,10 @@ public class KinectManager : MonoBehaviour
     private Vector3 GetVector3FromJoint(Kinect.Joint joint, bool centerToPlatform = true, int faceTo = -1)
     {
         // faceTo = -1 gives the POV of the player (1st person) and =1 gives the mirror
-        float scale = 1.0f;
-        Vector3 kinectPos = new Vector3(joint.Position.X * scale, joint.Position.Y * scale, faceTo * joint.Position.Z * scale);
+        Vector3 kinectPos = new Vector3(joint.Position.X * KinectBodyScale, joint.Position.Y * KinectBodyScale, faceTo * joint.Position.Z * KinectBodyScale);
 
         if (centerToPlatform)
         {
-
             kinectPos += platform.transform.position + OffsetVectorOfPlayer;
         }
         return kinectPos;

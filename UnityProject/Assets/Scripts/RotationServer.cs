@@ -24,6 +24,7 @@ public class RotationServer : MonoBehaviour
 {
     public int port = 25005;
     public float calibrationValue = 0;
+    public Transform hand;
     private Transform phoneTransform;
     private Transform lightSaberTransform; 
     private static Quaternion gyroAttitude;
@@ -93,10 +94,6 @@ public class RotationServer : MonoBehaviour
         {
             device = engine.UsedDevice();
         }
-
-        if(gyroAttitude == Quaternion.identity)
-            return;
-
         phoneTransform.rotation = gyroAttitude;
         phoneTransform.Rotate( 0f, 0f, 180f, Space.Self ); // Swap "handedness" of quaternion from gyro.
         
@@ -110,6 +107,12 @@ public class RotationServer : MonoBehaviour
         phoneTransform.Rotate( 0f, -calibrationYAngle, 0f, Space.World ); // Rotates y angle back however much it deviated when calibrationYAngle was saved.
 
         realRotation = getSmoothRotation(lightSaberTransform.rotation);
+
+        if(hand != null)
+        {
+            hand.rotation = realRotation;
+            hand.Rotate(new Vector3(180.0f, 0.0f, 0.0f), Space.Self);
+        }
 
         if(!listening)
         {
@@ -254,6 +257,18 @@ public class RotationServer : MonoBehaviour
         return realRotation;
     }
 
+    public Vector3 GetPosition()
+    {
+        if(hand != null)
+        {
+            return hand.position;
+        }
+        else
+        {
+            return Vector3.zero;
+        }
+    }
+
     public float GetAcceleration()
     {
         return accelerationData.magnitude;
@@ -303,9 +318,12 @@ public class RotationServer : MonoBehaviour
             magnetData.y = float.Parse(datas[15]);
             magnetData.z = float.Parse(datas[16]);
         }
-        gyroAttitude = gyroAttitudeData;
+        
+        if(gyroAttitudeData != Quaternion.identity)
+        {
+            gyroAttitude = gyroAttitudeData;
+        }
         accelerationData = accelData;
-
     }
 
     private static void Send(Socket handler, String data)
