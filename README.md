@@ -7,8 +7,8 @@ VR game using a hardware controller to enable players training sword fighting wi
 The following hardware and software is necessary:
 - Oculus Rift DK2
 - Oculus SDK 0.8 (newer could work but is untested)
-- Microsoft Kinect One (newer, square version)
-- Microsoft Kinect One SDK
+- Microsoft Kinect Two (newer, square version which also comes with XBox One)
+- Microsoft Kinect Two SDK
 - Computer with Windows 8
 - Unity 5.2
 - This github sourcecode (latest version in master)
