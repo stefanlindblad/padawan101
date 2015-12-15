@@ -36,7 +36,7 @@ built it onto an available and per USB connected Android Phone.
 (iPhone built can work but iphone rotations are measured differently,
 you have to press "U" then always when the game starts that the
 game knows to use iPhone rotation values)
-Start the App on the phone and connet to the client.
+Start the App on the phone and connect to the client.
 Both have to be in the same IP adress space.
 For good performance a 5G Wifi Connection is recommended.
 
