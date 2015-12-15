@@ -48,3 +48,12 @@ it. Hold the phone correctly upward (try different ways to hold it,
 there is only one version correct) and press "M" or "N" to rotate
 the rotation init value until the position of the phone matches
 with the position of the virtual lightsaber. Enjoy!
+
+
+##Common problems:
+
+Use different USB busses for Kinect and Oculus and USB3 for Kinect.
+Certain computing power is necessary for all the hardware input/output.
+We recommend a 2015 state of the art gaming computer.
+Do not use Unity4 or the old Unity Plugin Solution. The latest game
+is built to run with the Unity5 builtin Oculus Support.
