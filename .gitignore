@@ -1,7 +1,10 @@
 Library/
 Temp/
 .DS_Store
+<<<<<<< HEAD
 *.html
 *.htm
 *.csproj
 UnityProject/UnityProject.sln
+=======
+>>>>>>> origin/master
