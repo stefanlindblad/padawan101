@@ -23,8 +23,10 @@ ignored since they should be gone after cash rebuild etc.
 
 Run the Game in the Editor by pressing "Play".
 Press "H" to define the game client as host of the game.
-Press "R" to reset the game to zero points and to start again.
+Press "S" to reset the game to zero points and to start again.
 Press "A" to add more enemies if you want to have the game harder.
+Press "K" to kill all enemies.
+Press "I" to start the intro again if you wanna use it.
 
 
 ##How to start the game controller:
@@ -32,9 +34,17 @@ Press "A" to add more enemies if you want to have the game harder.
 Open the UnityEngine_mobileSaber game from the repo and
 built it onto an available and per USB connected Android Phone.
 (iPhone built can work but iphone rotations are measured differently,
-you have to press "I" then always when the game starts that the
+you have to press "U" then always when the game starts that the
 game knows to use iPhone rotation values)
 Start the App on the phone and connet to the client.
 Both have to be in the same IP adress space.
 For good performance a 5G Wifi Connection is recommended.
 
+
+##How to calibrate the game controller:
+
+If the rotation of the phone is not correct, you have to calibrate
+it. Hold the phone correctly upward (try different ways to hold it,
+there is only one version correct) and press "M" or "N" to rotate
+the rotation init value until the position of the phone matches
+with the position of the virtual lightsaber. Enjoy!
